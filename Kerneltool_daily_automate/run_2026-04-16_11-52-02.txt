@@ -1,0 +1,8 @@
+=======================================
+[*] Updating Linux repository
+=======================================
+fatal: detected dubious ownership in repository at '/home/gowtham-23345/Linux_Stable/linux'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/gowtham-23345/Linux_Stable/linux
+[!] git pull failed

@@ -1,0 +1,77 @@
+=======================================
+[*] Updating Linux repository
+=======================================
+Already up to date.
+[✓] Repository updated
+
+=======================================
+[*] Processing 5.10.y
+=======================================
+[*] Last processed version: 5.10.252
+[*] Latest available version: v5.10.252
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.1.y
+=======================================
+[*] Last processed version: 6.1.168
+[*] Latest available version: v6.1.168
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.12.y
+=======================================
+[*] Last processed version: 6.12.81
+[*] Latest available version: v6.12.81
+[✓] Already up-to-date
+
+=======================================
+[*] CVE Scraping
+=======================================
+[*] CVE start date: 2026-04-14
+INFO  Detected 14 CPUs -> using 7 parallel workers
+
+DATE [2026/04/14] Discovering CVE count ...
+     [2026/04/14] No CVEs found.
+
+DATE [2026/04/15] Discovering CVE count ...
+     [2026/04/15] No CVEs found.
+
+DATE [2026/04/16] Discovering CVE count ...
+     [2026/04/16] No CVEs found.
+
+DATE [2026/04/17] Discovering CVE count ...
+     [2026/04/17] No CVEs found.
+No CVEs found for the given date range.
+
+=======================================
+            FINAL SUMMARY              
+=======================================
+Branch: 5.10.y
+  Last Version   : 5.10.252
+  Latest Version : v5.10.252
+  New Commits    : 0
+
+Branch: 6.1.y
+  Last Version   : 6.1.168
+  Latest Version : v6.1.168
+  New Commits    : 0
+
+Branch: 6.12.y
+  Last Version   : 6.12.81
+  Latest Version : v6.12.81
+  New Commits    : 0
+
+CVE Summary:
+  Start Date : 2026-04-14
+  New CVEs   : 0
+=======================================
+[✓] FULL AUTOMATION COMPLETED
+=======================================
+
+=======================================
+[*] Sending Email Report
+=======================================
+mail: : file does not exist
+[✓] Email sent with log file: run_2026-04-17_11-46-00.txt
+[✓] Status file updated: update_status.txt

@@ -1,0 +1,791 @@
+#!/usr/bin/env python3
+"""
+kerneltool — Linux kernel stable-branch commit query tool.
+
+Query and filter 5.10.y / 6.1.y / 6.12.y commit data and CVE records
+using a familiar Unix-style command-line interface.
+
+Run:  kerneltool --help
+"""
+
+import os
+import sys
+import argparse
+import textwrap
+from datetime import datetime
+
+try:
+    import pandas as pd
+except ImportError:
+    sys.exit("✖  pandas is required:  pip install pandas openpyxl tabulate")
+
+try:
+    from tabulate import tabulate
+    HAS_TABULATE = True
+except ImportError:
+    HAS_TABULATE = False
+
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+
+STATUS_FILE         = "update_status.txt"
+STATUS_HISTORY_FILE = "update_status_history.txt"
+
+DATA_FILES = {
+    "5.10.y": os.path.join(SCRIPT_DIR, "5.10.y_commits.csv"),
+    "6.1.y":  os.path.join(SCRIPT_DIR, "6.1.y_commits.csv"),
+    "6.12.y": os.path.join(SCRIPT_DIR, "6.12.y_commits.csv"),
+}
+CVE_FILE = os.path.join(SCRIPT_DIR, "cve_scraper.csv")
+
+ALL_BRANCHES      = list(DATA_FILES.keys())
+ALL_SEVERITIES    = ["Critical", "High", "Medium", "Low", "Unknown"]
+ALL_APPLICABILITY = ["y-applicable", "m-applicable", "Not applicable", "File in NO list"]
+DATE_FMT          = "%d/%m/%Y %H:%M:%S"
+
+def _supports_colour():
+    return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
+
+BOLD = "\033[1m"  if _supports_colour() else ""
+DIM  = "\033[2m"  if _supports_colour() else ""
+RED  = "\033[31m" if _supports_colour() else ""
+YEL  = "\033[33m" if _supports_colour() else ""
+GRN  = "\033[32m" if _supports_colour() else ""
+CYA  = "\033[36m" if _supports_colour() else ""
+RST  = "\033[0m"  if _supports_colour() else ""
+
+SEV_COLOR = {
+    "Critical": RED + BOLD,
+    "High":     RED,
+    "Medium":   YEL,
+    "Low":      GRN,
+    "Unknown":  DIM,
+}
+
+EPILOG = textwrap.dedent("""
+EXAMPLES
+
+  # All commits in 6.1.y with CVE numbers annotated (blank if none)
+  kerneltool --branch 6.1.y --cve-annotate
+
+  # All commits from kernel version 6.1.123 up to 6.1.154
+  kerneltool --branch 6.1.y --version-from 6.1.123 --version-to 6.1.154
+
+  # Version range + CVE annotation + save to Excel
+  kerneltool --branch 6.1.y --version-from 6.1.100 --version-to 6.1.154 --cve-annotate --save-excel output.xlsx
+
+  # Critical commits in 5.10.y
+  kerneltool --branch 5.10.y --severity Critical
+
+  # Commits touching fs/ directory, showing actual Subsystem value
+  kerneltool --branch 6.1.y --subsystem fs/
+
+  # Multiple path filters (OR-combined)
+  kerneltool --subsystem drivers/net drivers/usb arch/arm64
+
+  # Look up specific commit hashes (short or full)
+  kerneltool --hash 143fc7220961 a1b2c3d4
+
+  # Look up CVEs and find matching commits
+  kerneltool --cve CVE-2021-47284 CVE-2022-4379
+
+  # Only commits that have a CVE entry (rows without CVE are removed)
+  kerneltool --branch 6.1.y --cve-xref
+
+  # All commits with CVE column shown (rows without CVE stay, field is blank)
+  kerneltool --branch 6.1.y --cve-annotate
+
+  # Filter by commit date range
+  kerneltool --branch 5.10.y --date-from 2021-01-01 --date-to 2021-12-31
+
+  # Commits tagged Cc-stable in wifi or Bluetooth
+  kerneltool --cc-stable --subsystem wifi Bluetooth
+
+  # Search description
+  kerneltool --search "use-after-free" --severity Critical High
+
+  # Custom output columns
+  kerneltool --severity Critical --fields hash description severity subsystem
+
+  # JSON output
+  kerneltool --severity High --format json
+
+  # Count only, no rows
+  kerneltool --severity Critical --count
+
+  # Summary statistics
+  kerneltool --branch 5.10.y --stats
+
+  # Show current update/sync status
+  kerneltool --updates
+
+  # Show all update records for a specific date from history
+  kerneltool --updates --date 2026-04-19
+
+  # Show all update records for today
+  kerneltool --updates --date 2026-04-20
+
+FIELD NAMES  (for --fields)
+  hash          Commit hash
+  link          GitHub URL
+  version       First version introduced
+  date-author   Author date
+  date-commit   Commit date
+  description   Commit description
+  subsystem     Subsystem
+  files         Files changed
+  config        CONFIG_ parameters
+  applicability Applicability flag
+  severity      Severity level
+  reason        Severity reason
+  backport      Backport status
+  cc-stable     Cc stable flag
+  cc-security   Cc security flag
+  fixes         All Fix-N commit hashes + descriptions
+  cves          Matched CVE numbers
+  all           Every column
+
+VERSION RANGE NOTES
+  --version-from / --version-to filter the "First Version" field,
+  i.e. the kernel release in which the commit first appeared.
+  Example: --version-from 6.1.123 --version-to 6.1.154
+  Both ends are inclusive. Either end can be omitted (open range).
+
+EXIT CODES
+  0   Results found
+  1   No results / error
+  2   Bad arguments
+""")
+
+
+# ── Update-status helpers ─────────────────────────────────────────────────
+
+def _parse_last_run_time(text):
+    """Extract the Last Run Time value from a status block string."""
+    for line in text.splitlines():
+        if line.strip().startswith("Last Run Time"):
+            parts = line.split(":", 1)
+            if len(parts) == 2:
+                return parts[1].strip()
+    return None
+
+
+def _split_status_blocks(text):
+    """Split a status file into individual blocks separated by ======= lines."""
+    blocks, current = [], []
+    for line in text.splitlines():
+        current.append(line)
+        if line.strip().startswith("=") and len(line.strip()) > 10 and current.count(line) >= 1:
+            block_text = "\n".join(current).strip()
+            if "Last Run Time" in block_text:
+                blocks.append(block_text)
+            current = []
+    # handle trailing content without a final separator
+    leftover = "\n".join(current).strip()
+    if "Last Run Time" in leftover:
+        blocks.append(leftover)
+    return blocks
+
+
+def print_last_updated(status_path, quiet=False):
+    """Print 'Last updated time' banner to stderr at the start of every run."""
+    if quiet:
+        return
+    if not os.path.exists(status_path):
+        return
+    try:
+        with open(status_path, "r") as fh:
+            content = fh.read()
+        ts = _parse_last_run_time(content)
+        if ts:
+            print(f"{CYA}Last updated time : {BOLD}{ts}{RST}", file=sys.stderr)
+            print(file=sys.stderr)
+    except OSError:
+        pass
+
+
+def cmd_show_updates(status_path, status_hist_path, date_filter=None):
+    """
+    Handle --updates [--date YYYY-MM-DD].
+
+    Without --date  → show update_status.txt (current snapshot).
+    With    --date  → show all matching blocks from update_status_history.txt.
+    """
+    if date_filter is None:
+        # Show current status
+        if not os.path.exists(status_path):
+            print(f"✖  Status file not found: {status_path}", file=sys.stderr)
+            sys.exit(1)
+        with open(status_path, "r") as fh:
+            print(fh.read())
+        sys.exit(0)
+
+    # Show historical entries matching the given date
+    if not os.path.exists(status_hist_path):
+        print(f"✖  History file not found: {status_hist_path}", file=sys.stderr)
+        sys.exit(1)
+
+    with open(status_hist_path, "r") as fh:
+        history_text = fh.read()
+
+    blocks = _split_status_blocks(history_text)
+    matched = [b for b in blocks if date_filter in b]
+
+    if not matched:
+        print(f"  No update records found for date: {date_filter}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"  {len(matched)} record(s) found for {date_filter}\n", file=sys.stderr)
+    for block in matched:
+        print(block)
+        print()
+    sys.exit(0)
+
+
+def build_parser():
+    p = argparse.ArgumentParser(
+        prog="kerneltool",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=(
+            "kerneltool — query Linux kernel stable-branch commit data\n\n"
+            "Filter commits across 5.10.y, 6.1.y, and 6.12.y stable branches\n"
+            "and cross-reference with CVE records."
+        ),
+        epilog=EPILOG,
+    )
+
+    lookup = p.add_argument_group("Input / lookup")
+    lookup.add_argument("--branch", "-b", nargs="+", choices=ALL_BRANCHES, metavar="BRANCH",
+        help=f"Branch(es) to query: {', '.join(ALL_BRANCHES)}. Default: all.")
+    lookup.add_argument("--hash", nargs="+", metavar="HASH",
+        help="Commit hash(es), full or short prefix. Case-insensitive.")
+    lookup.add_argument("--cve", nargs="+", metavar="CVE",
+        help="CVE ID(s) e.g. CVE-2021-47284. Shows CVE record then matching commits.")
+
+    filt = p.add_argument_group("Filters")
+    filt.add_argument("--severity", "-s", nargs="+", choices=ALL_SEVERITIES, metavar="LEVEL",
+        help=f"Severity: {', '.join(ALL_SEVERITIES)}. OR-combined.")
+    filt.add_argument("--subsystem", "-S", nargs="+", metavar="NAME",
+        help="Search keyword(s) in the 'Files Changed' column (e.g. fs/, drivers/net, arch/arm64). OR-combined. The Subsystem column value is shown unchanged in output.")
+    filt.add_argument("--applicability", "-a", nargs="+", choices=ALL_APPLICABILITY, metavar="VALUE",
+        help="Applicability values: y-applicable, m-applicable, Not applicable, File in NO list. OR-combined.")
+    filt.add_argument("--version-from", metavar="VER",
+        help="Include commits whose First Version >= VER. E.g. --version-from 6.1.123")
+    filt.add_argument("--version-to", metavar="VER",
+        help="Include commits whose First Version <= VER. E.g. --version-to 6.1.154")
+    filt.add_argument("--version", metavar="VER",
+        help="Exact/prefix First Version match. For a range use --version-from/--version-to.")
+    filt.add_argument("--cve-xref", action="store_true",
+        help="FILTER: keep ONLY commits that have a CVE. Rows without CVE are removed.")
+    filt.add_argument("--cve-annotate", action="store_true",
+        help="ANNOTATE: add 'Matched CVEs' column to ALL commits. Rows without CVE stay (field blank).")
+    filt.add_argument("--cc-stable", action="store_true",
+        help="Only commits tagged 'Cc: stable'.")
+    filt.add_argument("--cc-security", action="store_true",
+        help="Only commits tagged 'Cc: security'.")
+    filt.add_argument("--has-fixes", action="store_true",
+        help="Only commits that have at least one Fix entry.")
+    filt.add_argument("--date-from", metavar="YYYY-MM-DD",
+        help="CommitDate >= this date.")
+    filt.add_argument("--date-to", metavar="YYYY-MM-DD",
+        help="CommitDate <= this date.")
+    filt.add_argument("--search", metavar="TEXT",
+        help="Case-insensitive substring search in Description.")
+    filt.add_argument("--config", metavar="PARAM",
+        help="Substring search in CONFIG_ Parameters field.")
+
+    out = p.add_argument_group("Output")
+    out.add_argument("--fields", "-f", nargs="+", metavar="FIELD",
+        help="Columns to display (see FIELD NAMES). Default: hash version description subsystem severity applicability cves.")
+    out.add_argument("--format", choices=["table", "csv", "json", "tsv"], default="table",
+        help="Output format (default: table).")
+    out.add_argument("--limit", "-n", type=int, default=0, metavar="N",
+        help="Limit printed rows to N (0 = no limit).")
+    out.add_argument("--count", action="store_true",
+        help="Print only the match count; suppress row output.")
+    out.add_argument("--stats", action="store_true",
+        help="Print severity / applicability / CVE breakdown.")
+    out.add_argument("--no-header", action="store_true",
+        help="Suppress column headers.")
+
+    save = p.add_argument_group("Save")
+    save.add_argument("--save-csv",   metavar="FILE", help="Save results to CSV.")
+    save.add_argument("--save-excel", metavar="FILE", help="Save to Excel (one sheet per branch + combined).")
+    save.add_argument("--save-json",  metavar="FILE", help="Save results to JSON.")
+
+    p.add_argument("--data-dir",    metavar="DIR",  help="Directory containing the CSV data files.")
+    p.add_argument("--quiet", "-q", action="store_true", help="Suppress progress messages.")
+    p.add_argument("--version-info", action="version", version="kerneltool 1.1.0")
+
+    upd = p.add_argument_group("Update status")
+    upd.add_argument("--updates", action="store_true",
+        help="Show current update status (from update_status.txt). "
+             "Combine with --date to filter history.")
+    upd.add_argument("--date", metavar="YYYY-MM-DD",
+        help="Used with --updates: show all records from update_status_history.txt "
+             "whose timestamp matches this date (e.g. --date 2026-04-19).")
+
+    return p
+
+
+# ── Version helpers ───────────────────────────────────────────────────────
+
+def parse_version(v):
+    parts = []
+    for p in str(v).strip().split("."):
+        try:
+            parts.append(int(p))
+        except ValueError:
+            parts.append(0)
+    return tuple(parts)
+
+
+def version_in_range(ver_series, from_ver, to_ver):
+    parsed = ver_series.fillna("").apply(lambda v: parse_version(v) if v else None)
+    mask = pd.Series(True, index=ver_series.index)
+    if from_ver:
+        fv = parse_version(from_ver)
+        mask &= parsed.apply(lambda v: v is not None and v >= fv)
+    if to_ver:
+        tv = parse_version(to_ver)
+        mask &= parsed.apply(lambda v: v is not None and v <= tv)
+    return mask
+
+
+# ── Data loading ──────────────────────────────────────────────────────────
+
+def resolve_paths(args):
+    base = args.data_dir if args.data_dir else os.getcwd()
+    df_map      = {b: os.path.join(base, os.path.basename(p)) for b, p in DATA_FILES.items()}
+    cve         = os.path.join(base, os.path.basename(CVE_FILE))
+    status      = os.path.join(base, STATUS_FILE)
+    status_hist = os.path.join(base, STATUS_HISTORY_FILE)
+    return df_map, cve, status, status_hist
+
+
+def load_csv(path, label, quiet):
+    if not os.path.exists(path):
+        print(f"✖  File not found: {path}", file=sys.stderr)
+        return None
+    if not quiet:
+        print(f"  Loading {label}…", end=" ", flush=True, file=sys.stderr)
+    df = pd.read_csv(path, low_memory=False)
+    if not quiet:
+        print(f"{len(df):,} rows", file=sys.stderr)
+    return df
+
+
+# ── CVE helpers ───────────────────────────────────────────────────────────
+
+def cve_short_hashes(cve_df, branch):
+    col = f"{branch} Fixed Commit"
+    if col not in cve_df.columns:
+        return set()
+    return set(cve_df[col].dropna().astype(str).str.lower().str.strip())
+
+
+def build_cve_map(cve_df, branch):
+    col = f"{branch} Fixed Commit"
+    if col not in cve_df.columns:
+        return {}
+    tmp = cve_df[["CVE Number", col]].dropna(subset=[col]).copy()
+    tmp["_sh"] = tmp[col].astype(str).str.lower().str.strip()
+    return tmp.groupby("_sh")["CVE Number"].apply(lambda x: ", ".join(x)).to_dict()
+
+
+def hash_has_cve(full_hash, short_set):
+    fh = full_hash.lower()
+    return any(fh.startswith(s) for s in short_set)
+
+
+def hash_to_cves(full_hash, cve_map):
+    fh = full_hash.lower()
+    found = [v for k, v in cve_map.items() if fh.startswith(k)]
+    return ", ".join(found) if found else None
+
+
+def filter_cve_records(cve_df, cve_ids):
+    ids_upper = [c.upper() for c in cve_ids]
+    return cve_df[cve_df["CVE Number"].str.upper().isin(ids_upper)].copy()
+
+
+# ── Core filtering ────────────────────────────────────────────────────────
+
+def parse_date(s):
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(s, fmt)
+        except ValueError:
+            pass
+    return None
+
+
+def apply_filters(df, branch, args, cve_short, commit_hashes_from_cve):
+    hash_col      = f"{branch} Commit Hash"
+    applic_col    = f"{branch} Applicability"
+    commit_col    = f"{branch} CommitDate"
+    version_col   = f"{branch} First Version"
+    fix_hash_cols = [c for c in df.columns if c.startswith("Fix-") and "Commit Hash" in c]
+
+    mask = pd.Series(True, index=df.index)
+
+    all_hashes = list(args.hash or []) + commit_hashes_from_cve
+    if all_hashes:
+        hl = [h.lower() for h in all_hashes]
+        mask &= df[hash_col].str.lower().apply(
+            lambda fh: any(fh.startswith(h) or h.startswith(fh) for h in hl)
+        )
+
+    if args.severity:
+        mask &= df["Severity"].isin(args.severity)
+
+    if args.subsystem:
+        sm = pd.Series(False, index=df.index)
+        for kw in args.subsystem:
+            sm |= df["Files Changed"].fillna("").str.lower().str.contains(kw.lower(), regex=False)
+        mask &= sm
+
+    if args.applicability:
+        mask &= df[applic_col].isin(args.applicability)
+
+    # cve-xref: FILTER (removes rows without CVE)
+    if args.cve_xref and cve_short is not None:
+        mask &= df[hash_col].apply(lambda h: hash_has_cve(h, cve_short))
+
+    if args.cc_stable:
+        mask &= df["Cc stable"].str.strip().str.lower() == "yes"
+    if args.cc_security:
+        mask &= df["Cc security"].str.strip().str.lower() == "yes"
+
+    if args.has_fixes:
+        fix_mask = pd.Series(False, index=df.index)
+        for fc in fix_hash_cols:
+            fix_mask |= df[fc].notna()
+        mask &= fix_mask
+
+    if args.date_from or args.date_to:
+        dates = pd.to_datetime(df[commit_col], format=DATE_FMT, errors="coerce")
+        if args.date_from:
+            d = parse_date(args.date_from)
+            if d:
+                mask &= dates >= d
+        if args.date_to:
+            d = parse_date(args.date_to)
+            if d:
+                mask &= dates <= d
+
+    # version range filter
+    if args.version_from or args.version_to:
+        mask &= version_in_range(df[version_col], args.version_from, args.version_to)
+
+    # exact/prefix version
+    if args.version:
+        mask &= df[version_col].fillna("").astype(str).str.startswith(args.version)
+
+    if args.search:
+        mask &= df["Description"].fillna("").str.lower().str.contains(
+            args.search.lower(), regex=False)
+
+    if args.config:
+        mask &= df["CONFIG_ Parameters"].fillna("").str.lower().str.contains(
+            args.config.lower(), regex=False)
+
+    return df[mask].copy()
+
+
+# ── Column selection ──────────────────────────────────────────────────────
+
+FIELD_MAP = {
+    "hash":          lambda b: [f"{b} Commit Hash"],
+    "link":          lambda b: [f"{b} GitHub Link"],
+    "version":       lambda b: [f"{b} First Version"],
+    "date-author":   lambda b: [f"{b} AuthorDate"],
+    "date-commit":   lambda b: [f"{b} CommitDate"],
+    "description":   lambda b: ["Description"],
+    "subsystem":     lambda b: ["Subsystem"],
+    "files":         lambda b: ["Files Changed"],
+    "config":        lambda b: ["CONFIG_ Parameters"],
+    "applicability": lambda b: [f"{b} Applicability"],
+    "severity":      lambda b: ["Severity"],
+    "reason":        lambda b: ["Severity Reason"],
+    "backport":      lambda b: ["Backport Status"],
+    "cc-stable":     lambda b: ["Cc stable"],
+    "cc-security":   lambda b: ["Cc security"],
+    "fixes":         lambda b: [],
+    "cves":          lambda b: ["Matched CVEs"],
+}
+
+# version and cves are now default
+DEFAULT_FIELDS = ["hash", "version", "description", "subsystem", "severity", "applicability", "cves"]
+
+
+def select_columns(df, branch, fields):
+    if not fields or "all" in fields:
+        return df
+
+    cols = ["Branch"]
+    for f in fields:
+        if f == "fixes":
+            cols += [c for c in df.columns if c.startswith("Fix-") and "Commit Hash" in c]
+            cols += [c for c in df.columns if c.startswith("Fix-") and "Description" in c]
+        elif f in FIELD_MAP:
+            cols += [c for c in FIELD_MAP[f](branch) if c in df.columns]
+        else:
+            print(f"⚠  Unknown field '{f}' — skipped", file=sys.stderr)
+
+    seen, final = set(), []
+    for c in cols:
+        if c not in seen and c in df.columns:
+            seen.add(c)
+            final.append(c)
+    return df[final] if final else df
+
+
+# ── Output rendering ──────────────────────────────────────────────────────
+
+def colourize_severity(df):
+    if "Severity" not in df.columns or not _supports_colour():
+        return df
+    df = df.copy()
+    df["Severity"] = df["Severity"].apply(
+        lambda s: f"{SEV_COLOR.get(s, '')}{s}{RST}" if pd.notna(s) else s
+    )
+    return df
+
+
+def render_table(df, no_header):
+    if df.empty:
+        return ""
+    display = colourize_severity(df).fillna("")
+    if HAS_TABULATE:
+        return tabulate(display, headers=[] if no_header else "keys",
+                        tablefmt="simple", showindex=False, disable_numparse=True, maxcolwidths=60)
+    return display.to_string(index=False, header=not no_header)
+
+
+def render_output(df, fmt, no_header):
+    if df.empty:
+        return ""
+    if fmt == "table":  return render_table(df, no_header)
+    if fmt == "csv":    return df.to_csv(index=False, header=not no_header)
+    if fmt == "tsv":    return df.to_csv(index=False, sep="\t", header=not no_header)
+    if fmt == "json":   return df.to_json(orient="records", indent=2)
+    return render_table(df, no_header)
+
+
+def print_stats(df, branch):
+    total = len(df)
+    print(f"\n  Severity")
+    for sev in ALL_SEVERITIES:
+        n = (df["Severity"] == sev).sum()
+        if n:
+            pct = n / total * 100
+            bar = "█" * max(1, int(pct / 2))
+            print(f"    {sev:<12}  {n:>6,}  {pct:4.1f}%  {bar}")
+
+    applic_col = f"{branch} Applicability"
+    if applic_col in df.columns:
+        print(f"\n  Applicability")
+        for a in ALL_APPLICABILITY:
+            n = (df[applic_col] == a).sum()
+            if n:
+                pct = n / total * 100
+                print(f"    {a:<22}  {n:>6,}  {pct:4.1f}%")
+
+    if "Matched CVEs" in df.columns:
+        n_cve = df["Matched CVEs"].notna().sum()
+        print(f"\n  CVE-matched commits  {n_cve:,} / {total:,}  ({n_cve/total*100:.1f}%)")
+
+    cc_s = (df["Cc stable"].str.strip().str.lower() == "yes").sum()
+    print(f"  Cc stable            {cc_s:,}")
+
+    ver_col = f"{branch} First Version"
+    if ver_col in df.columns:
+        versions = df[ver_col].dropna()
+        if not versions.empty:
+            sv = sorted(versions.unique(), key=parse_version)
+            print(f"\n  Version range  {sv[0]}  →  {sv[-1]}  ({len(sv)} distinct versions)")
+
+
+# ── Save helpers ──────────────────────────────────────────────────────────
+
+def save_csv(results, path, quiet):
+    combined = pd.concat(results.values(), ignore_index=True)
+    combined.to_csv(path, index=False)
+    if not quiet:
+        print(f"  ✔  Saved CSV   → {path}  ({len(combined):,} rows)", file=sys.stderr)
+
+
+def save_excel(results, path, quiet):
+    try:
+        import openpyxl
+    except ImportError:
+        sys.exit("✖  openpyxl required:  pip install openpyxl")
+    with pd.ExcelWriter(path, engine="openpyxl") as writer:
+        for label, df in results.items():
+            df.to_excel(writer, sheet_name=label[:31], index=False)
+        combined = pd.concat(results.values(), ignore_index=True)
+        combined.to_excel(writer, sheet_name="combined", index=False)
+    if not quiet:
+        total = sum(len(d) for d in results.values())
+        print(f"  ✔  Saved Excel → {path}  ({total:,} rows, {len(results)+1} sheets)", file=sys.stderr)
+
+
+def save_json(results, path, quiet):
+    combined = pd.concat(results.values(), ignore_index=True)
+    combined.to_json(path, orient="records", indent=2)
+    if not quiet:
+        print(f"  ✔  Saved JSON  → {path}  ({len(combined):,} rows)", file=sys.stderr)
+
+
+# ── Main ──────────────────────────────────────────────────────────────────
+
+def main():
+    parser = build_parser()
+    args   = parser.parse_args()
+
+    # ── Always show last-updated banner ───────────────────────────────────
+    print_last_updated(status_path=os.path.join(
+        args.data_dir if args.data_dir else os.getcwd(), STATUS_FILE
+    ), quiet=getattr(args, "quiet", False))
+
+    # ── --updates [--date YYYY-MM-DD] ─────────────────────────────────────
+    if getattr(args, "updates", False):
+        base = args.data_dir if args.data_dir else os.getcwd()
+        cmd_show_updates(
+            status_path=os.path.join(base, STATUS_FILE),
+            status_hist_path=os.path.join(base, STATUS_HISTORY_FILE),
+            date_filter=getattr(args, "date", None),
+        )
+        # cmd_show_updates calls sys.exit() so execution stops here
+
+    branches = args.branch or ALL_BRANCHES
+    df_paths, cve_path, _status, _status_hist = resolve_paths(args)
+
+    for attr, flag in [("date_from", "--date-from"), ("date_to", "--date-to")]:
+        val = getattr(args, attr, None)
+        if val and not parse_date(val):
+            parser.error(f"{flag}: invalid date '{val}'. Use YYYY-MM-DD.")
+
+    for attr, flag in [("version_from", "--version-from"), ("version_to", "--version-to")]:
+        val = getattr(args, attr, None)
+        if val:
+            parts = str(val).split(".")
+            if not all(p.isdigit() for p in parts):
+                parser.error(f"{flag}: invalid version '{val}'. Use format like 6.1.123")
+
+    if args.version_from and args.version_to:
+        if parse_version(args.version_from) > parse_version(args.version_to):
+            parser.error(
+                f"--version-from ({args.version_from}) must be <= --version-to ({args.version_to})"
+            )
+
+    needs_cve = bool(args.cve or args.cve_xref or args.cve_annotate)
+
+    cve_df = None
+    if needs_cve:
+        cve_df = load_csv(cve_path, "CVE data", args.quiet)
+        if cve_df is None:
+            sys.exit(1)
+
+    cve_hashes = []
+    if args.cve and cve_df is not None:
+        matched_cves = filter_cve_records(cve_df, args.cve)
+        if not args.quiet:
+            print(f"\nCVE records  ({len(matched_cves):,} matched)\n", file=sys.stderr)
+        if not matched_cves.empty:
+            cve_display_cols = ["CVE Number", "Description"] + [
+                f"{b} Fixed Commit" for b in branches
+                if f"{b} Fixed Commit" in matched_cves.columns
+            ]
+            print(render_output(matched_cves[cve_display_cols], args.format, args.no_header))
+            print()
+            for b in branches:
+                col = f"{b} Fixed Commit"
+                if col in matched_cves.columns:
+                    cve_hashes += matched_cves[col].dropna().astype(str).tolist()
+        else:
+            print(f"  No CVE records found for: {', '.join(args.cve)}", file=sys.stderr)
+
+    if not args.quiet:
+        print(file=sys.stderr)
+
+    all_results = {}
+
+    for branch in branches:
+        df = load_csv(df_paths[branch], branch, args.quiet)
+        if df is None:
+            continue
+
+        cve_short = cve_short_hashes(cve_df, branch) if cve_df is not None else None
+        cve_map   = build_cve_map(cve_df, branch)    if cve_df is not None else {}
+
+        filtered = apply_filters(df, branch, args, cve_short, cve_hashes)
+
+        # Always attach CVE column when CVE data is loaded (annotate or xref or --cve)
+        if cve_df is not None:
+            hash_col = f"{branch} Commit Hash"
+            filtered["Matched CVEs"] = filtered[hash_col].apply(
+                lambda h: hash_to_cves(h, cve_map)
+            )
+
+        filtered.insert(0, "Branch", branch)
+        all_results[branch] = filtered
+
+    total = sum(len(d) for d in all_results.values())
+    if total == 0:
+        print("  No results found.", file=sys.stderr)
+        sys.exit(1)
+
+    for branch, df in all_results.items():
+        if df.empty:
+            continue
+
+        if not args.quiet:
+            ver_info = ""
+            if (args.version_from or args.version_to) and f"{branch} First Version" in df.columns:
+                versions = sorted(df[f"{branch} First Version"].dropna().unique(), key=parse_version)
+                if versions:
+                    ver_info = f"  (versions {versions[0]} → {versions[-1]})"
+
+            print(
+                f"\n{'─'*60}\n"
+                f"  {branch}  —  {len(df):,} commit(s){ver_info}\n"
+                f"{'─'*60}",
+                file=sys.stderr,
+            )
+
+        if args.stats:
+            print_stats(df, branch)
+
+        if not args.count:
+            display = select_columns(df, branch, args.fields or DEFAULT_FIELDS)
+            if args.limit > 0:
+                display = display.head(args.limit)
+            out = render_output(display, args.format, args.no_header)
+            if out:
+                print(out)
+
+    if not args.quiet:
+        branch_summary = "  ".join(
+            f"{b}: {len(d):,}" for b, d in all_results.items() if not d.empty
+        )
+        print(
+            f"\n{'─'*60}\n"
+            f"  Total: {total:,} commit(s)   {branch_summary}\n"
+            f"{'─'*60}\n",
+            file=sys.stderr,
+        )
+
+    non_empty = {b: d for b, d in all_results.items() if not d.empty}
+    if args.save_csv:
+        save_csv(non_empty, args.save_csv, args.quiet)
+    if args.save_excel:
+        save_excel(non_empty, args.save_excel, args.quiet)
+    if args.save_json:
+        save_json(non_empty, args.save_json, args.quiet)
+
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

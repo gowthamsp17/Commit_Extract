@@ -1,0 +1,582 @@
+=======================================
+[*] Updating Linux repository
+=======================================
+From https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux
+   8541d8f725c6..faeab166167f  master               -> origin/master
+   327d73d5ef3a..6e93ccc29258  linux-rolling-lts    -> origin/linux-rolling-lts
+   2471b673d88d..c15712c36028  linux-rolling-stable -> origin/linux-rolling-stable
+Updating 8541d8f725c6..faeab166167f
+Fast-forward
+ Documentation/ABI/testing/sysfs-bus-i3c            |   20 +
+ .../devicetree/bindings/i2c/i2c-iop3xx.txt         |   20 -
+ .../devicetree/bindings/i2c/intel,ixp4xx-i2c.yaml  |   41 +
+ .../devicetree/bindings/i2c/qcom,i2c-cci.yaml      |   20 +
+ .../bindings/i2c/realtek,rtl9301-i2c.yaml          |   15 +
+ .../devicetree/bindings/i2c/renesas,riic.yaml      |    1 +
+ .../bindings/i2c/snps,designware-i2c.yaml          |    2 -
+ .../devicetree/bindings/i2c/spacemit,k1-i2c.yaml   |    6 +-
+ .../devicetree/bindings/pinctrl/apple,pinctrl.yaml |    4 +-
+ .../bindings/pinctrl/fsl,imx27-iomuxc.yaml         |  126 +
+ .../bindings/pinctrl/fsl,imx27-pinctrl.txt         |  121 -
+ .../bindings/pinctrl/fsl,imx35-pinctrl.yaml        |    1 +
+ .../pinctrl/marvell,armada3710-xb-pinctrl.yaml     |   11 +-
+ .../bindings/pinctrl/maxim,max77620-pinctrl.yaml   |   98 +
+ .../devicetree/bindings/pinctrl/pincfg-node.yaml   |  107 +-
+ .../bindings/pinctrl/pinctrl-max77620.txt          |  127 -
+ .../bindings/pinctrl/pinctrl-single.yaml           |    4 +
+ .../bindings/pinctrl/qcom,eliza-tlmm.yaml          |  138 +
+ .../bindings/pinctrl/qcom,hawi-tlmm.yaml           |  120 +
+ .../bindings/pinctrl/qcom,ipq5210-tlmm.yaml        |  123 +
+ .../bindings/pinctrl/qcom,lpass-lpi-common.yaml    |    8 +
+ .../pinctrl/qcom,milos-lpass-lpi-pinctrl.yaml      |  109 +
+ .../pinctrl/qcom,sdm670-lpass-lpi-pinctrl.yaml     |   81 +
+ .../pinctrl/qcom,sm8450-lpass-lpi-pinctrl.yaml     |    8 +-
+ .../pinctrl/qcom,sm8650-lpass-lpi-pinctrl.yaml     |    4 +-
+ .../bindings/pinctrl/realtek,rtd1315e-pinctrl.yaml |    7 +-
+ .../bindings/pinctrl/realtek,rtd1319d-pinctrl.yaml |    7 +-
+ .../bindings/pinctrl/realtek,rtd1619b-pinctrl.yaml |    7 +-
+ .../bindings/pinctrl/realtek,rtd1625-pinctrl.yaml  |  260 ++
+ .../pinctrl/renesas,r9a09g077-pinctrl.yaml         |   17 +
+ .../bindings/pinctrl/rockchip,pinctrl.yaml         |    1 +
+ arch/Kconfig                                       |    7 +
+ arch/arm64/mm/init.c                               |    3 -
+ arch/parisc/Kconfig                                |    7 +-
+ arch/parisc/Makefile                               |    6 +-
+ arch/parisc/include/asm/checksum.h                 |   89 +-
+ arch/parisc/include/asm/compat.h                   |    2 +-
+ arch/parisc/include/asm/vdso.h                     |    2 +
+ arch/parisc/kernel/Makefile                        |    3 +-
+ arch/parisc/kernel/signal.c                        |   18 +-
+ arch/parisc/kernel/sys_parisc.c                    |    4 +
+ arch/parisc/kernel/syscall.S                       |   11 +-
+ arch/parisc/kernel/syscalls/syscall.tbl            |    2 +-
+ arch/parisc/lib/Makefile                           |    2 +-
+ arch/parisc/lib/checksum.c                         |   99 -
+ arch/powerpc/kernel/fadump.c                       |   16 +-
+ arch/powerpc/platforms/powernv/opal-core.c         |   11 +-
+ arch/sparc/kernel/mdesc.c                          |    4 +-
+ arch/x86/kernel/alternative.c                      |   22 +-
+ arch/x86/kernel/setup.c                            |    2 +-
+ arch/x86/platform/efi/memmap.c                     |    5 +-
+ arch/x86/platform/efi/quirks.c                     |    2 +-
+ drivers/char/ipmi/Kconfig                          |   10 +
+ drivers/char/ipmi/ipmi_msghandler.c                |   10 +-
+ drivers/char/ipmi/ipmi_ssif.c                      |   41 +-
+ drivers/char/ipmi/ssif_bmc.c                       |  405 ++-
+ drivers/firmware/efi/apple-properties.c            |    2 +-
+ drivers/gpio/gpio-rockchip.c                       |    2 +-
+ drivers/gpio/gpio-spacemit-k1.c                    |    1 +
+ drivers/i2c/busses/Kconfig                         |    3 +-
+ drivers/i2c/busses/i2c-cp2615.c                    |    5 +-
+ drivers/i2c/busses/i2c-designware-platdrv.c        |    1 +
+ drivers/i2c/busses/i2c-diolan-u2c.c                |   12 +-
+ drivers/i2c/busses/i2c-k1.c                        |  316 +-
+ drivers/i2c/busses/i2c-npcm7xx.c                   |    2 +-
+ drivers/i2c/busses/i2c-ocores.c                    |   24 +-
+ drivers/i2c/busses/i2c-qcom-cci.c                  |    3 -
+ drivers/i2c/busses/i2c-qcom-geni.c                 |   24 +-
+ drivers/i2c/busses/i2c-robotfuzz-osif.c            |    4 +-
+ drivers/i2c/busses/i2c-rtl9300.c                   |  195 +-
+ drivers/i2c/busses/i2c-s3c2410.c                   |    7 +-
+ drivers/i2c/busses/i2c-tegra.c                     |  534 +++-
+ drivers/i2c/busses/i2c-tiny-usb.c                  |   13 +-
+ drivers/i2c/busses/i2c-usbio.c                     |    1 +
+ drivers/i2c/busses/i2c-xiic.c                      |   97 +-
+ drivers/i2c/i2c-atr.c                              |   17 +-
+ drivers/i3c/master.c                               |  113 +-
+ drivers/i3c/master/adi-i3c-master.c                |    5 +-
+ drivers/i3c/master/dw-i3c-master.c                 |   51 +-
+ drivers/i3c/master/i3c-master-cdns.c               |    2 +-
+ drivers/i3c/master/mipi-i3c-hci/core.c             |   35 +-
+ drivers/i3c/master/mipi-i3c-hci/dma.c              |    5 +-
+ drivers/i3c/master/mipi-i3c-hci/hci.h              |    7 +
+ drivers/i3c/master/mipi-i3c-hci/mipi-i3c-hci-pci.c |  138 +
+ drivers/i3c/master/renesas-i3c.c                   |    9 +-
+ drivers/i3c/master/svc-i3c-master.c                |    8 +-
+ drivers/of/kexec.c                                 |    2 +-
+ drivers/parisc/ccio-dma.c                          |    8 +-
+ drivers/parisc/led.c                               |    6 +-
+ drivers/pinctrl/Kconfig                            |   11 +-
+ drivers/pinctrl/bcm/Kconfig                        |    4 +-
+ drivers/pinctrl/core.c                             |    7 +-
+ drivers/pinctrl/devicetree.c                       |    2 +-
+ drivers/pinctrl/freescale/Kconfig                  |    2 +-
+ drivers/pinctrl/meson/Kconfig                      |    1 -
+ drivers/pinctrl/microchip/pinctrl-mpfs-mssio.c     |    2 +-
+ drivers/pinctrl/nomadik/pinctrl-abx500.c           |    2 +-
+ drivers/pinctrl/nxp/pinctrl-s32.h                  |    2 +-
+ drivers/pinctrl/pinconf-generic.c                  |   94 +-
+ drivers/pinctrl/pinctrl-amd.c                      |    1 +
+ drivers/pinctrl/pinctrl-cy8c95x0.c                 |   93 +-
+ drivers/pinctrl/pinctrl-pic32.c                    |   64 +-
+ drivers/pinctrl/pinctrl-rockchip.c                 |  313 +-
+ drivers/pinctrl/pinctrl-rockchip.h                 |    1 +
+ drivers/pinctrl/pinctrl-single.c                   |    6 +-
+ drivers/pinctrl/qcom/Kconfig                       |   20 +
+ drivers/pinctrl/qcom/Kconfig.msm                   |   28 +
+ drivers/pinctrl/qcom/Makefile                      |    5 +
+ drivers/pinctrl/qcom/pinctrl-apq8084.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-eliza.c               | 1545 ++++++++++
+ drivers/pinctrl/qcom/pinctrl-glymur.c              |    5 +-
+ drivers/pinctrl/qcom/pinctrl-hawi.c                | 1610 ++++++++++
+ drivers/pinctrl/qcom/pinctrl-ipq4019.c             |    1 -
+ drivers/pinctrl/qcom/pinctrl-ipq5018.c             |    1 -
+ drivers/pinctrl/qcom/pinctrl-ipq5210.c             |  897 ++++++
+ drivers/pinctrl/qcom/pinctrl-ipq5332.c             |    1 -
+ drivers/pinctrl/qcom/pinctrl-ipq5424.c             |    1 -
+ drivers/pinctrl/qcom/pinctrl-ipq6018.c             |    1 -
+ drivers/pinctrl/qcom/pinctrl-ipq8074.c             |    1 -
+ drivers/pinctrl/qcom/pinctrl-ipq9574.c             |    1 -
+ drivers/pinctrl/qcom/pinctrl-kaanapali.c           |    3 -
+ drivers/pinctrl/qcom/pinctrl-mdm9607.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-milos-lpass-lpi.c     |  217 ++
+ drivers/pinctrl/qcom/pinctrl-milos.c               |    3 -
+ drivers/pinctrl/qcom/pinctrl-msm.c                 |   20 +-
+ drivers/pinctrl/qcom/pinctrl-msm.h                 |    6 +-
+ drivers/pinctrl/qcom/pinctrl-msm8226.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-msm8909.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-msm8916.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-msm8917.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-msm8953.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-msm8976.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-msm8994.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-msm8996.c             |    2 -
+ drivers/pinctrl/qcom/pinctrl-msm8998.c             |    3 -
+ drivers/pinctrl/qcom/pinctrl-msm8x74.c             |    3 -
+ drivers/pinctrl/qcom/pinctrl-qcm2290.c             |    3 -
+ drivers/pinctrl/qcom/pinctrl-qcs404.c              |    2 -
+ drivers/pinctrl/qcom/pinctrl-qcs615.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-qcs8300.c             |    3 -
+ drivers/pinctrl/qcom/pinctrl-qdf2xxx.c             |    1 -
+ drivers/pinctrl/qcom/pinctrl-qdu1000.c             |    3 -
+ drivers/pinctrl/qcom/pinctrl-sa8775p.c             |    3 -
+ drivers/pinctrl/qcom/pinctrl-sar2130p.c            |    2 -
+ drivers/pinctrl/qcom/pinctrl-sc7180.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sc7280.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sc8180x.c             |    3 -
+ drivers/pinctrl/qcom/pinctrl-sc8280xp.c            |    3 -
+ drivers/pinctrl/qcom/pinctrl-sdm660.c              |    2 -
+ drivers/pinctrl/qcom/pinctrl-sdm670-lpass-lpi.c    |  166 ++
+ drivers/pinctrl/qcom/pinctrl-sdm670.c              |    4 -
+ drivers/pinctrl/qcom/pinctrl-sdm845.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sdx55.c               |    2 -
+ drivers/pinctrl/qcom/pinctrl-sdx65.c               |    3 -
+ drivers/pinctrl/qcom/pinctrl-sdx75.c               |    2 -
+ drivers/pinctrl/qcom/pinctrl-sm4450.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm6115.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm6125.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm6350.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm6375.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm7150.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm8150.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm8250.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm8350.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm8450.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm8550.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm8650.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-sm8750.c              |    3 -
+ drivers/pinctrl/qcom/pinctrl-x1e80100.c            |    3 -
+ drivers/pinctrl/realtek/Kconfig                    |   14 +
+ drivers/pinctrl/realtek/Makefile                   |    1 +
+ drivers/pinctrl/realtek/pinctrl-rtd.c              |  224 +-
+ drivers/pinctrl/realtek/pinctrl-rtd.h              |   50 +
+ drivers/pinctrl/realtek/pinctrl-rtd1625.c          | 3138 ++++++++++++++++++++
+ drivers/pinctrl/renesas/pinctrl-rzg2l.c            |    8 +-
+ drivers/pinctrl/renesas/pinctrl-rzt2h.c            |  258 ++
+ drivers/pinctrl/sophgo/pinctrl-sg2042.c            |    2 +-
+ drivers/pinctrl/sophgo/pinctrl-sg2044.c            |    2 +-
+ drivers/pinctrl/spacemit/pinctrl-k1.c              |   21 +-
+ drivers/pinctrl/starfive/Kconfig                   |    2 -
+ drivers/pinctrl/sunplus/Kconfig                    |    1 -
+ drivers/pinctrl/tegra/pinctrl-tegra.c              |   10 +-
+ drivers/pinctrl/tegra/pinctrl-tegra.h              |    4 +-
+ include/linux/bootmem_info.h                       |    4 -
+ include/linux/memblock.h                           |    2 -
+ include/linux/mm.h                                 |    3 -
+ include/linux/pinctrl/pinconf-generic.h            |    5 +-
+ init/initramfs.c                                   |    7 -
+ kernel/dma/swiotlb.c                               |    6 +-
+ lib/bootconfig.c                                   |    2 +-
+ mm/internal.h                                      |   10 +
+ mm/kfence/core.c                                   |    4 +-
+ mm/memblock.c                                      |  231 +-
+ mm/mm_init.c                                       |   25 -
+ mm/page_alloc.c                                    |   46 -
+ scripts/module.lds.S                               |    2 +
+ tools/build/feature/Makefile                       |   10 +-
+ tools/include/linux/mm.h                           |    3 +-
+ tools/lib/perf/cpumap.c                            |   49 +-
+ tools/lib/perf/evsel.c                             |   10 +-
+ tools/lib/perf/include/internal/cpumap.h           |    6 +-
+ tools/lib/perf/include/perf/cpumap.h               |    4 +-
+ tools/perf/Documentation/perf-annotate.txt         |    7 +-
+ tools/perf/Documentation/perf-bench.txt            |    4 +
+ tools/perf/Documentation/perf-config.txt           |    6 +
+ tools/perf/Documentation/perf-diff.txt             |    7 +-
+ tools/perf/Documentation/perf-kwork.txt            |    7 +-
+ tools/perf/Documentation/perf-probe.txt            |    6 +
+ tools/perf/Documentation/perf-report.txt           |   15 +-
+ tools/perf/Documentation/perf-sched.txt            |    7 +-
+ tools/perf/Documentation/perf-script.txt           |    7 +-
+ tools/perf/Documentation/perf-stat.txt             |    4 +
+ tools/perf/Documentation/perf-timechart.txt        |    7 +-
+ tools/perf/Documentation/tips.txt                  |    2 +-
+ tools/perf/Makefile.config                         |    1 +
+ tools/perf/Makefile.perf                           |    6 +-
+ tools/perf/arch/arm/util/auxtrace.c                |    6 +-
+ tools/perf/arch/arm/util/cs-etm.c                  |    7 +-
+ tools/perf/arch/arm64/util/arm-spe.c               |    3 +-
+ tools/perf/arch/arm64/util/header.c                |    2 +-
+ tools/perf/arch/common.c                           |   22 +-
+ tools/perf/arch/loongarch/util/Build               |    1 -
+ tools/perf/arch/powerpc/util/auxtrace.c            |    1 +
+ tools/perf/arch/sh/include/dwarf-regs-table.h      |    2 +-
+ tools/perf/arch/x86/tests/amd-ibs-period.c         |    3 +-
+ tools/perf/arch/x86/tests/dwarf-unwind.c           |   11 +-
+ tools/perf/arch/x86/util/pmu.c                     |   16 +-
+ tools/perf/bench/breakpoint.c                      |    4 +-
+ tools/perf/bench/mem-functions.c                   |  111 +-
+ tools/perf/bench/numa.c                            |   15 +-
+ tools/perf/bench/sched-messaging.c                 |    2 +-
+ tools/perf/bench/uprobe.c                          |    2 +-
+ tools/perf/builtin-annotate.c                      |   15 +-
+ tools/perf/builtin-bench.c                         |   42 +-
+ tools/perf/builtin-c2c.c                           |   19 +-
+ tools/perf/builtin-config.c                        |    2 +-
+ tools/perf/builtin-daemon.c                        |    4 +-
+ tools/perf/builtin-data.c                          |    8 +-
+ tools/perf/builtin-diff.c                          |   13 +-
+ tools/perf/builtin-ftrace.c                        |    1 +
+ tools/perf/builtin-inject.c                        |   69 +-
+ tools/perf/builtin-kmem.c                          |    2 +-
+ tools/perf/builtin-kwork.c                         |   18 +-
+ tools/perf/builtin-lock.c                          |    2 +-
+ tools/perf/builtin-probe.c                         |    4 +-
+ tools/perf/builtin-record.c                        |  106 +-
+ tools/perf/builtin-report.c                        |   30 +-
+ tools/perf/builtin-sched.c                         |   12 +-
+ tools/perf/builtin-script.c                        |   45 +-
+ tools/perf/builtin-stat.c                          |   92 +-
+ tools/perf/builtin-timechart.c                     |    3 +-
+ tools/perf/builtin-top.c                           |   51 +-
+ tools/perf/builtin-trace.c                         |   34 +-
+ tools/perf/check-headers.sh                        |    6 +-
+ tools/perf/jvmti/libjvmti.c                        |    5 +-
+ tools/perf/perf.c                                  |   12 +-
+ tools/perf/pmu-events/Build                        |    4 +-
+ .../arch/arm64/common-and-microarch.json           |   85 +
+ tools/perf/pmu-events/arch/arm64/mapfile.csv       |    1 +
+ .../pmu-events/arch/arm64/nvidia/t410/branch.json  |   45 +
+ .../pmu-events/arch/arm64/nvidia/t410/brbe.json    |    6 +
+ .../pmu-events/arch/arm64/nvidia/t410/bus.json     |   48 +
+ .../arch/arm64/nvidia/t410/exception.json          |   62 +
+ .../arch/arm64/nvidia/t410/fp_operation.json       |   78 +
+ .../pmu-events/arch/arm64/nvidia/t410/general.json |   15 +
+ .../arch/arm64/nvidia/t410/l1d_cache.json          |  122 +
+ .../arch/arm64/nvidia/t410/l1i_cache.json          |  114 +
+ .../arch/arm64/nvidia/t410/l2d_cache.json          |  134 +
+ .../arch/arm64/nvidia/t410/ll_cache.json           |  107 +
+ .../pmu-events/arch/arm64/nvidia/t410/memory.json  |   46 +
+ .../pmu-events/arch/arm64/nvidia/t410/metrics.json |  722 +++++
+ .../pmu-events/arch/arm64/nvidia/t410/misc.json    |  642 ++++
+ .../pmu-events/arch/arm64/nvidia/t410/retired.json |   94 +
+ .../pmu-events/arch/arm64/nvidia/t410/spe.json     |   42 +
+ .../arch/arm64/nvidia/t410/spec_operation.json     |  230 ++
+ .../pmu-events/arch/arm64/nvidia/t410/stall.json   |  145 +
+ .../pmu-events/arch/arm64/nvidia/t410/tlb.json     |  158 +
+ .../pmu-events/arch/common/common/metrics.json     |    6 +-
+ .../perf/pmu-events/arch/x86/alderlake/cache.json  |   27 +-
+ .../pmu-events/arch/x86/alderlake/frontend.json    |   18 +
+ .../pmu-events/arch/x86/alderlake/pipeline.json    |   66 +-
+ .../perf/pmu-events/arch/x86/alderlaken/cache.json |   27 +-
+ .../pmu-events/arch/x86/alderlaken/pipeline.json   |   60 +-
+ .../perf/pmu-events/arch/x86/arrowlake/cache.json  |  103 +-
+ .../pmu-events/arch/x86/arrowlake/frontend.json    |   18 +
+ .../pmu-events/arch/x86/arrowlake/pipeline.json    |   40 +-
+ .../pmu-events/arch/x86/emeraldrapids/cache.json   |    4 +-
+ .../arch/x86/emeraldrapids/frontend.json           |   16 +
+ .../arch/x86/emeraldrapids/uncore-cache.json       |    4 +-
+ .../arch/x86/emeraldrapids/uncore-io.json          |   17 +-
+ .../perf/pmu-events/arch/x86/grandridge/cache.json |   42 +-
+ .../pmu-events/arch/x86/grandridge/pipeline.json   |   42 +-
+ .../arch/x86/graniterapids/frontend.json           |   16 +
+ .../arch/x86/graniterapids/gnr-metrics.json        |   27 +
+ .../perf/pmu-events/arch/x86/lunarlake/cache.json  |   36 +-
+ .../pmu-events/arch/x86/lunarlake/frontend.json    |   27 +
+ .../pmu-events/arch/x86/lunarlake/pipeline.json    |   10 +-
+ tools/perf/pmu-events/arch/x86/mapfile.csv         |   22 +-
+ .../perf/pmu-events/arch/x86/meteorlake/cache.json |   67 +-
+ .../pmu-events/arch/x86/meteorlake/frontend.json   |   18 +
+ .../pmu-events/arch/x86/meteorlake/pipeline.json   |   46 +-
+ .../pmu-events/arch/x86/pantherlake/cache.json     |  159 +-
+ .../arch/x86/pantherlake/floating-point.json       |   28 +
+ .../pmu-events/arch/x86/pantherlake/frontend.json  |   36 +
+ .../pmu-events/arch/x86/pantherlake/memory.json    |   27 +
+ .../pmu-events/arch/x86/pantherlake/other.json     |   10 +
+ .../pmu-events/arch/x86/pantherlake/pipeline.json  |  200 +-
+ .../arch/x86/pantherlake/virtual-memory.json       |   30 +
+ .../pmu-events/arch/x86/sapphirerapids/cache.json  |    4 +-
+ .../arch/x86/sapphirerapids/frontend.json          |   16 +
+ .../arch/x86/sapphirerapids/uncore-cache.json      |    4 +-
+ .../arch/x86/sapphirerapids/uncore-io.json         |   17 +-
+ .../pmu-events/arch/x86/sierraforest/cache.json    |   22 +-
+ .../pmu-events/arch/x86/sierraforest/pipeline.json |   42 +-
+ tools/perf/pmu-events/empty-pmu-events.c           |  108 +-
+ tools/perf/tests/bitmap.c                          |    2 +-
+ tools/perf/tests/bp_signal.c                       |    2 +-
+ tools/perf/tests/code-reading.c                    |    1 +
+ tools/perf/tests/cpumap.c                          |    6 +-
+ tools/perf/tests/dso-data.c                        |    2 +-
+ tools/perf/tests/event_update.c                    |    4 +-
+ tools/perf/tests/expand-cgroup.c                   |    4 +-
+ tools/perf/tests/hists_cumulate.c                  |    2 +-
+ tools/perf/tests/hists_filter.c                    |    1 +
+ tools/perf/tests/hists_output.c                    |    2 +-
+ tools/perf/tests/mem2node.c                        |    2 +-
+ tools/perf/tests/openat-syscall-all-cpus.c         |    3 +-
+ tools/perf/tests/parse-events.c                    |   49 +-
+ tools/perf/tests/perf-record.c                     |    8 +-
+ tools/perf/tests/shell/data_type_profiling.sh      |    6 +-
+ tools/perf/tests/shell/kwork.sh                    |   79 +
+ tools/perf/tests/shell/perf_sched_stats.sh         |   42 +-
+ .../tests/shell/record+probe_libc_inet_pton.sh     |    8 +-
+ tools/perf/tests/shell/stat_bpf_counters.sh        |   20 +-
+ tools/perf/tests/shell/test_brstack.sh             |  146 +-
+ tools/perf/tests/shell/test_task_analyzer.sh       |   42 +-
+ tools/perf/tests/shell/trace_btf_general.sh        |    2 +-
+ tools/perf/tests/switch-tracking.c                 |    2 +
+ tools/perf/tests/thread-map.c                      |    1 -
+ tools/perf/tests/topology.c                        |   11 +-
+ tools/perf/tests/workloads/datasym.c               |    6 +-
+ tools/perf/tests/wp.c                              |    6 +-
+ tools/perf/trace/beauty/drm_ioctl.sh               |    2 +-
+ tools/perf/trace/beauty/fadvise.sh                 |    2 +-
+ .../{ => perf/trace/beauty}/include/uapi/drm/drm.h |    0
+ .../trace/beauty}/include/uapi/drm/i915_drm.h      |    0
+ .../trace/beauty}/include/uapi/linux/fadvise.h     |    0
+ tools/perf/util/Build                              |    2 -
+ tools/perf/util/addr2line.c                        |   17 +-
+ tools/perf/util/addr2line.h                        |    2 -
+ tools/perf/util/affinity.c                         |    2 +-
+ tools/perf/util/annotate-arch/annotate-loongarch.c |    1 +
+ tools/perf/util/annotate-arch/annotate-x86.c       |   70 +-
+ tools/perf/util/annotate-data.c                    |  119 +-
+ tools/perf/util/annotate-data.h                    |    3 +
+ tools/perf/util/annotate.c                         |    3 +-
+ tools/perf/util/arm-spe.c                          |   26 +-
+ tools/perf/util/block-info.c                       |    2 +-
+ tools/perf/util/block-range.c                      |    2 +-
+ tools/perf/util/bpf-event.c                        |    2 +-
+ tools/perf/util/bpf_counter.c                      |   28 +-
+ tools/perf/util/bpf_counter_cgroup.c               |    9 +-
+ tools/perf/util/bpf_kwork.c                        |    3 +-
+ tools/perf/util/bpf_kwork_top.c                    |    3 +-
+ tools/perf/util/bpf_map.c                          |   70 -
+ tools/perf/util/bpf_map.h                          |   23 -
+ tools/perf/util/bpf_off_cpu.c                      |    4 +-
+ tools/perf/util/bpf_skel/syscall_summary.bpf.c     |   18 +-
+ tools/perf/util/bpf_trace_augment.c                |    2 +-
+ tools/perf/util/branch.h                           |    3 +
+ tools/perf/util/callchain.c                        |   83 +-
+ tools/perf/util/callchain.h                        |   12 +-
+ tools/perf/util/cgroup.c                           |   30 +-
+ tools/perf/util/clockid.h                          |    3 +-
+ tools/perf/util/config.c                           |    6 +-
+ tools/perf/util/cpu-set-sched.h                    |   50 -
+ tools/perf/util/cpumap.c                           |   10 +-
+ tools/perf/util/cputopo.c                          |    2 +-
+ tools/perf/util/cs-etm-decoder/cs-etm-decoder.c    |   56 +-
+ tools/perf/util/data-convert-bt.c                  |   74 +-
+ tools/perf/util/data-convert-json.c                |   16 +-
+ tools/perf/util/data.c                             |  101 +-
+ tools/perf/util/data.h                             |   52 +-
+ tools/perf/util/db-export.c                        |    1 -
+ tools/perf/util/debug.c                            |    2 +-
+ tools/perf/util/debuginfo.c                        |   19 +-
+ tools/perf/util/disasm.c                           |   11 +-
+ tools/perf/util/disasm.h                           |    2 +
+ tools/perf/util/drm_pmu.c                          |   36 +-
+ tools/perf/util/dsos.c                             |   35 +-
+ tools/perf/util/dump-insn.c                        |   23 -
+ tools/perf/util/dwarf-aux.c                        |  145 +-
+ tools/perf/util/dwarf-aux.h                        |    9 +-
+ tools/perf/util/env.c                              |    2 +-
+ tools/perf/util/env.h                              |    1 +
+ tools/perf/util/event.c                            |    1 -
+ tools/perf/util/evlist.c                           |   40 +-
+ tools/perf/util/evlist.h                           |    2 +-
+ tools/perf/util/evsel.c                            |  112 +-
+ tools/perf/util/evsel.h                            |   10 +-
+ tools/perf/util/expr.c                             |    7 +-
+ tools/perf/util/header.c                           |  436 ++-
+ tools/perf/util/header.h                           |    9 +-
+ tools/perf/util/hist.c                             |    5 +-
+ tools/perf/util/hist.h                             |    2 +
+ tools/perf/util/intel-tpebs.c                      |   12 +-
+ tools/perf/util/libbfd.c                           |    2 +-
+ tools/perf/util/llvm.c                             |   10 +-
+ tools/perf/util/maps.c                             |   24 +-
+ tools/perf/util/mem2node.c                         |    2 +-
+ tools/perf/util/metricgroup.c                      |   29 +-
+ tools/perf/util/ordered-events.c                   |    2 +-
+ tools/perf/util/parse-events.c                     |    2 +-
+ tools/perf/util/perf-regs-arch/perf_regs_s390.c    |   78 +
+ tools/perf/util/perf_regs.c                        |    3 +
+ tools/perf/util/perf_regs.h                        |    1 +
+ tools/perf/util/pmus.c                             |    2 +-
+ tools/perf/util/powerpc-vpadtl.c                   |   11 +-
+ tools/perf/util/probe-event.c                      |   20 +-
+ tools/perf/util/probe-file.c                       |    2 +-
+ tools/perf/util/probe-finder.c                     |    8 +-
+ tools/perf/util/sample.c                           |   11 +-
+ tools/perf/util/sample.h                           |  140 +-
+ .../util/scripting-engines/trace-event-python.c    |    2 +-
+ tools/perf/util/session.c                          |   83 +-
+ tools/perf/util/sort.c                             |  276 +-
+ tools/perf/util/sort.h                             |    2 +
+ tools/perf/util/srcline.c                          |   12 +-
+ tools/perf/util/stat-display.c                     |    4 +-
+ tools/perf/util/stat-shadow.c                      |    1 -
+ tools/perf/util/stat.c                             |    8 +-
+ tools/perf/util/svghelper.c                        |    3 +-
+ tools/perf/util/symbol-elf.c                       |   20 +-
+ tools/perf/util/symbol.c                           |   40 +-
+ tools/perf/util/symbol.h                           |   11 +-
+ tools/perf/util/symbol_conf.h                      |    4 +-
+ tools/perf/util/synthetic-events.c                 |    2 +-
+ tools/perf/util/target.h                           |   12 +-
+ tools/perf/util/unwind-libunwind-local.c           |    1 -
+ tools/perf/util/util.c                             |   10 +-
+ tools/perf/util/util.h                             |    3 +-
+ tools/perf/util/values.c                           |    8 +-
+ tools/testing/memblock/internal.h                  |   43 +-
+ tools/testing/memblock/linux/string_helpers.h      |   10 +
+ tools/testing/memblock/mmzone.c                    |    4 -
+ 445 files changed, 18701 insertions(+), 3216 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/i2c/i2c-iop3xx.txt
+ create mode 100644 Documentation/devicetree/bindings/i2c/intel,ixp4xx-i2c.yaml
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/fsl,imx27-iomuxc.yaml
+ delete mode 100644 Documentation/devicetree/bindings/pinctrl/fsl,imx27-pinctrl.txt
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/maxim,max77620-pinctrl.yaml
+ delete mode 100644 Documentation/devicetree/bindings/pinctrl/pinctrl-max77620.txt
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/qcom,eliza-tlmm.yaml
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/qcom,hawi-tlmm.yaml
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/qcom,ipq5210-tlmm.yaml
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/qcom,milos-lpass-lpi-pinctrl.yaml
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/qcom,sdm670-lpass-lpi-pinctrl.yaml
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/realtek,rtd1625-pinctrl.yaml
+ delete mode 100644 arch/parisc/lib/checksum.c
+ create mode 100644 drivers/pinctrl/qcom/pinctrl-eliza.c
+ create mode 100644 drivers/pinctrl/qcom/pinctrl-hawi.c
+ create mode 100644 drivers/pinctrl/qcom/pinctrl-ipq5210.c
+ create mode 100644 drivers/pinctrl/qcom/pinctrl-milos-lpass-lpi.c
+ create mode 100644 drivers/pinctrl/qcom/pinctrl-sdm670-lpass-lpi.c
+ create mode 100644 drivers/pinctrl/realtek/pinctrl-rtd1625.c
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/branch.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/brbe.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/bus.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/exception.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/fp_operation.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/general.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/l1d_cache.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/l1i_cache.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/l2d_cache.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/ll_cache.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/memory.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/metrics.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/misc.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/retired.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/spe.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/spec_operation.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/stall.json
+ create mode 100644 tools/perf/pmu-events/arch/arm64/nvidia/t410/tlb.json
+ create mode 100755 tools/perf/tests/shell/kwork.sh
+ rename tools/{ => perf/trace/beauty}/include/uapi/drm/drm.h (100%)
+ rename tools/{ => perf/trace/beauty}/include/uapi/drm/i915_drm.h (100%)
+ rename tools/{ => perf/trace/beauty}/include/uapi/linux/fadvise.h (100%)
+ delete mode 100644 tools/perf/util/bpf_map.c
+ delete mode 100644 tools/perf/util/bpf_map.h
+ delete mode 100644 tools/perf/util/cpu-set-sched.h
+ delete mode 100644 tools/perf/util/dump-insn.c
+ create mode 100644 tools/testing/memblock/linux/string_helpers.h
+[✓] Repository updated
+
+=======================================
+[*] Processing 5.10.y
+=======================================
+[*] Last processed version: 5.10.253
+[*] Latest available version: v5.10.253
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.1.y
+=======================================
+[*] Last processed version: 6.1.169
+[*] Latest available version: v6.1.169
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.12.y
+=======================================
+[*] Last processed version: 6.12.82
+[*] Latest available version: v6.12.82
+[✓] Already up-to-date
+
+=======================================
+[*] CVE Scraping
+=======================================
+[*] CVE start date: 2026-04-14
+INFO  Detected 14 CPUs -> using 7 parallel workers
+
+DATE [2026/04/14] Discovering CVE count ...
+     [2026/04/14] No CVEs found.
+
+DATE [2026/04/15] Discovering CVE count ...
+     [2026/04/15] No CVEs found.
+
+DATE [2026/04/16] Discovering CVE count ...
+     [2026/04/16] No CVEs found.
+
+DATE [2026/04/17] Discovering CVE count ...
+     [2026/04/17] No CVEs found.
+
+DATE [2026/04/18] Discovering CVE count ...
+     [2026/04/18] No CVEs found.
+
+DATE [2026/04/19] Discovering CVE count ...
+     [2026/04/19] No CVEs found.
+
+DATE [2026/04/20] Discovering CVE count ...
+     [2026/04/20] No CVEs found.
+No CVEs found for the given date range.
+
+=======================================
+            FINAL SUMMARY              
+=======================================
+Branch: 5.10.y
+  Last Version   : 5.10.253
+  Latest Version : v5.10.253
+  New Commits    : 0
+
+Branch: 6.1.y
+  Last Version   : 6.1.169
+  Latest Version : v6.1.169
+  New Commits    : 0
+
+Branch: 6.12.y
+  Last Version   : 6.12.82
+  Latest Version : v6.12.82
+  New Commits    : 0
+
+CVE Summary:
+  Start Date : 2026-04-14
+  New CVEs   : 0
+=======================================
+[✓] FULL AUTOMATION COMPLETED
+=======================================
+[✓] Status file updated: update_status.txt
+
+=======================================
+[*] Sending Email Report
+=======================================
+[✓] Email sent with log file: run_2026-04-20_10-00-01.txt

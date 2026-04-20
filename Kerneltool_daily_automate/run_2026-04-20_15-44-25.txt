@@ -1,0 +1,477 @@
+=======================================
+[*] Updating Linux repository
+=======================================
+From https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux
+   faeab166167f..c1f49dea2b8f  master     -> origin/master
+Updating faeab166167f..c1f49dea2b8f
+Fast-forward
+ CREDITS                                            |    8 +
+ Documentation/ABI/testing/sysfs-class-power        |    3 +-
+ Documentation/admin-guide/mm/damon/lru_sort.rst    |    4 +
+ Documentation/admin-guide/mm/damon/reclaim.rst     |    4 +
+ Documentation/admin-guide/mm/kho.rst               |   41 +-
+ .../bindings/chrome/google,cros-ec-typec.yaml      |   19 +-
+ .../bindings/connector/usb-connector.yaml          |   39 +-
+ .../devicetree/bindings/mfd/maxim,max77759.yaml    |   16 +-
+ Documentation/devicetree/bindings/serial/8250.yaml |    1 +
+ .../bindings/serial/amlogic,meson-uart.yaml        |    1 +
+ .../bindings/serial/atmel,at91-usart.yaml          |    1 +
+ .../devicetree/bindings/serial/renesas,rsci.yaml   |   26 +
+ .../bindings/serial/snps-dw-apb-uart.yaml          |    1 +
+ .../bindings/usb/atmel,at91rm9200-udc.yaml         |   76 +
+ .../bindings/usb/atmel,at91sam9rl-udc.yaml         |   74 +
+ .../devicetree/bindings/usb/atmel-usb.txt          |  125 --
+ .../devicetree/bindings/usb/cdns,usb3.yaml         |    1 +
+ .../devicetree/bindings/usb/corechips,sl6341.yaml  |   79 +
+ .../devicetree/bindings/usb/fsl,imx8mp-dwc3.yaml   |    2 +
+ .../devicetree/bindings/usb/generic-ehci.yaml      |   46 +-
+ .../devicetree/bindings/usb/generic-ohci.yaml      |   41 +
+ .../devicetree/bindings/usb/maxim,max33359.yaml    |    8 +
+ .../devicetree/bindings/usb/maxim,max3421.txt      |   23 -
+ .../devicetree/bindings/usb/maxim,max3421.yaml     |   67 +
+ .../bindings/usb/microchip,mpfs-musb.yaml          |    3 +
+ .../devicetree/bindings/usb/nxp,imx-dwc3.yaml      |  123 ++
+ .../devicetree/bindings/usb/nxp,ptn5110.yaml       |    4 +
+ Documentation/devicetree/bindings/usb/ohci-st.txt  |   36 -
+ Documentation/devicetree/bindings/usb/omap-usb.txt |   80 -
+ .../devicetree/bindings/usb/qcom,snps-dwc3.yaml    |   41 +-
+ .../bindings/usb/renesas,upd720201-pci.yaml        |   63 +
+ .../devicetree/bindings/usb/richtek,rt1711h.yaml   |   18 +-
+ .../devicetree/bindings/usb/spacemit,k1-dwc3.yaml  |    6 +-
+ .../devicetree/bindings/usb/st,st-ohci-300x.yaml   |   85 ++
+ .../bindings/usb/starfive,jhb100-dwc3.yaml         |   64 +
+ .../devicetree/bindings/usb/terminus,fe11.yaml     |   62 +
+ Documentation/devicetree/bindings/usb/ti,dwc3.yaml |  100 ++
+ .../devicetree/bindings/usb/ti,omap4-musb.yaml     |  120 ++
+ .../devicetree/bindings/usb/ti,usb8041.yaml        |   23 +-
+ .../devicetree/bindings/vendor-prefixes.yaml       |    6 +
+ Documentation/filesystems/proc.rst                 |    4 +
+ MAINTAINERS                                        |   40 +-
+ drivers/base/core.c                                |   15 +
+ drivers/base/dd.c                                  |   20 +
+ drivers/base/property.c                            |    2 +
+ drivers/base/swnode.c                              |    2 +-
+ drivers/block/zram/zram_drv.c                      |    5 +-
+ drivers/mfd/max77759.c                             |   95 +-
+ drivers/power/supply/Kconfig                       |   11 +
+ drivers/power/supply/Makefile                      |    1 +
+ drivers/power/supply/max77759_charger.c            |  774 ++++++++++
+ drivers/power/supply/power_supply_sysfs.c          |    2 +
+ drivers/staging/axis-fifo/axis-fifo.c              |   59 +-
+ drivers/staging/fbtft/Kconfig                      |    6 +-
+ drivers/staging/fbtft/README                       |   29 +-
+ drivers/staging/fbtft/fb_agm1264k-fl.c             |    2 +-
+ drivers/staging/fbtft/fb_hx8340bn.c                |    8 -
+ drivers/staging/fbtft/fb_hx8353d.c                 |   13 -
+ drivers/staging/fbtft/fb_hx8357d.c                 |   14 -
+ drivers/staging/fbtft/fb_ili9163.c                 |    2 +-
+ drivers/staging/fbtft/fb_ili9340.c                 |   12 -
+ drivers/staging/fbtft/fb_ili9341.c                 |   12 -
+ drivers/staging/fbtft/fb_ili9481.c                 |   12 -
+ drivers/staging/fbtft/fb_ili9486.c                 |   12 -
+ drivers/staging/fbtft/fb_s6d02a1.c                 |   12 -
+ drivers/staging/fbtft/fb_st7735r.c                 |   12 -
+ drivers/staging/fbtft/fb_tinylcd.c                 |   14 +-
+ drivers/staging/fbtft/fbtft-core.c                 |   13 +-
+ .../greybus/Documentation/firmware/authenticate.c  |    2 +-
+ drivers/staging/greybus/Kconfig                    |    2 +-
+ drivers/staging/greybus/arche-apb-ctrl.c           |   10 +-
+ drivers/staging/greybus/arche-platform.c           |   10 +-
+ drivers/staging/greybus/audio_codec.c              |    2 +-
+ drivers/staging/greybus/audio_manager.c            |   12 -
+ drivers/staging/greybus/audio_manager.h            |    7 -
+ drivers/staging/greybus/audio_manager_module.c     |   13 +-
+ drivers/staging/greybus/loopback.c                 |   18 +-
+ drivers/staging/greybus/pwm.c                      |    2 +-
+ drivers/staging/greybus/raw.c                      |   92 +-
+ drivers/staging/greybus/sdio.c                     |    4 +-
+ .../staging/most/Documentation/driver_usage.txt    |   10 +-
+ drivers/staging/most/dim2/dim2.c                   |   98 +-
+ drivers/staging/most/dim2/hal.c                    |    7 +-
+ drivers/staging/most/net/net.c                     |    1 -
+ drivers/staging/nvec/nvec.c                        |   21 +-
+ drivers/staging/octeon/ethernet-rx.c               |    2 +-
+ drivers/staging/octeon/ethernet-tx.c               |    2 -
+ drivers/staging/octeon/octeon-stubs.h              | 1614 ++++++++++----------
+ drivers/staging/rtl8723bs/core/rtw_ap.c            |   51 +-
+ drivers/staging/rtl8723bs/core/rtw_btcoex.c        |    1 -
+ drivers/staging/rtl8723bs/core/rtw_cmd.c           |  113 +-
+ drivers/staging/rtl8723bs/core/rtw_efuse.c         |   24 +-
+ drivers/staging/rtl8723bs/core/rtw_ieee80211.c     |  133 +-
+ drivers/staging/rtl8723bs/core/rtw_io.c            |    9 +-
+ drivers/staging/rtl8723bs/core/rtw_ioctl_set.c     |   21 +-
+ drivers/staging/rtl8723bs/core/rtw_mlme.c          |  205 ++-
+ drivers/staging/rtl8723bs/core/rtw_mlme_ext.c      |   63 +-
+ drivers/staging/rtl8723bs/core/rtw_pwrctrl.c       |  104 +-
+ drivers/staging/rtl8723bs/core/rtw_recv.c          |  142 +-
+ drivers/staging/rtl8723bs/core/rtw_security.c      |  110 +-
+ drivers/staging/rtl8723bs/core/rtw_sta_mgt.c       |   36 +-
+ drivers/staging/rtl8723bs/core/rtw_wlan_util.c     |   16 +-
+ drivers/staging/rtl8723bs/core/rtw_xmit.c          |   15 +-
+ drivers/staging/rtl8723bs/hal/HalBtc8723b1Ant.c    |   60 +-
+ drivers/staging/rtl8723bs/hal/HalPhyRf_8723B.c     |   36 +-
+ drivers/staging/rtl8723bs/hal/hal_btcoex.c         |    7 +-
+ drivers/staging/rtl8723bs/hal/hal_com.c            |   52 +-
+ drivers/staging/rtl8723bs/hal/hal_com_phycfg.c     |   24 +-
+ drivers/staging/rtl8723bs/hal/odm.c                |    4 +-
+ drivers/staging/rtl8723bs/hal/odm.h                |   43 +-
+ drivers/staging/rtl8723bs/hal/odm_CfoTracking.c    |    8 +-
+ drivers/staging/rtl8723bs/hal/odm_DIG.c            |   36 +-
+ drivers/staging/rtl8723bs/hal/odm_RegConfig8723B.c |    6 +-
+ drivers/staging/rtl8723bs/hal/odm_interface.h      |   12 +-
+ drivers/staging/rtl8723bs/hal/odm_types.h          |    4 -
+ drivers/staging/rtl8723bs/hal/rtl8723b_cmd.c       |    2 +
+ drivers/staging/rtl8723bs/hal/rtl8723b_hal_init.c  |    9 +-
+ drivers/staging/rtl8723bs/hal/rtl8723b_phycfg.c    |    1 +
+ drivers/staging/rtl8723bs/hal/rtl8723bs_recv.c     |    1 +
+ drivers/staging/rtl8723bs/hal/rtl8723bs_xmit.c     |    6 +-
+ drivers/staging/rtl8723bs/hal/sdio_halinit.c       |   11 +-
+ drivers/staging/rtl8723bs/hal/sdio_ops.c           |   12 +-
+ drivers/staging/rtl8723bs/include/basic_types.h    |   38 +-
+ drivers/staging/rtl8723bs/include/hal_com.h        |    2 -
+ drivers/staging/rtl8723bs/include/hal_data.h       |    2 +-
+ drivers/staging/rtl8723bs/include/ieee80211.h      |   32 +-
+ drivers/staging/rtl8723bs/include/ioctl_cfg80211.h |   60 -
+ drivers/staging/rtl8723bs/include/rtl8192c_recv.h  |    4 -
+ drivers/staging/rtl8723bs/include/rtl8723b_hal.h   |    2 -
+ drivers/staging/rtl8723bs/include/rtw_cmd.h        |    2 +-
+ drivers/staging/rtl8723bs/include/rtw_efuse.h      |   19 -
+ drivers/staging/rtl8723bs/include/rtw_mlme.h       |   36 +-
+ drivers/staging/rtl8723bs/include/rtw_mlme_ext.h   |    4 +-
+ drivers/staging/rtl8723bs/include/wlan_bssdef.h    |    5 +-
+ drivers/staging/rtl8723bs/os_dep/ioctl_cfg80211.c  |   43 +-
+ drivers/staging/rtl8723bs/os_dep/os_intfs.c        |   18 +-
+ drivers/staging/rtl8723bs/os_dep/sdio_intf.c       |   25 +-
+ drivers/staging/rtl8723bs/os_dep/xmit_linux.c      |    9 +-
+ drivers/staging/sm750fb/ddk750_mode.c              |    2 +-
+ drivers/staging/sm750fb/ddk750_swi2c.c             |    2 +-
+ drivers/staging/sm750fb/sm750.c                    |   91 +-
+ drivers/staging/sm750fb/sm750_hw.c                 |   26 +-
+ drivers/staging/vme_user/vme_user.h                |   10 -
+ drivers/thunderbolt/dma_port.c                     |   15 +-
+ drivers/thunderbolt/path.c                         |   28 +-
+ drivers/thunderbolt/quirks.c                       |    7 +
+ drivers/thunderbolt/switch.c                       |   30 +-
+ drivers/thunderbolt/tb.h                           |    5 +-
+ drivers/thunderbolt/tunnel.c                       |   10 +-
+ drivers/thunderbolt/tunnel.h                       |    5 +-
+ drivers/tty/hvc/hvc_iucv.c                         |    2 +-
+ drivers/tty/pty.c                                  |   12 +-
+ drivers/tty/serial/8250/8250_core.c                |    2 +-
+ drivers/tty/serial/8250/8250_fintek.c              |   10 +-
+ drivers/tty/serial/8250/8250_pci.c                 |   51 +
+ drivers/tty/serial/8250/8250_port.c                |    4 +-
+ drivers/tty/serial/8250/Kconfig                    |    9 +-
+ drivers/tty/serial/Kconfig                         |   33 +-
+ drivers/tty/serial/Makefile                        |    2 -
+ drivers/tty/serial/amba-pl011.c                    |  149 +-
+ drivers/tty/serial/apbuart.c                       |    2 +-
+ drivers/tty/serial/atmel_serial.c                  |    2 +-
+ drivers/tty/serial/dz.c                            |    2 +-
+ drivers/tty/serial/esp32_acm.c                     |  459 ------
+ drivers/tty/serial/esp32_uart.c                    |  779 ----------
+ drivers/tty/serial/imx.c                           |    7 +-
+ drivers/tty/serial/ip22zilog.c                     |    4 +-
+ drivers/tty/serial/mxs-auart.c                     |    3 +-
+ drivers/tty/serial/qcom_geni_serial.c              |   21 +-
+ drivers/tty/serial/rsci.c                          |   13 +
+ drivers/tty/serial/rsci.h                          |    1 +
+ drivers/tty/serial/samsung_tty.c                   |   10 +-
+ drivers/tty/serial/sh-sci-common.h                 |    1 +
+ drivers/tty/serial/sh-sci.c                        |   14 +-
+ drivers/tty/serial/xilinx_uartps.c                 |    1 -
+ drivers/tty/serial/zs.c                            |    2 +-
+ drivers/tty/tty_buffer.c                           |   15 +-
+ drivers/tty/tty_io.c                               |   25 +-
+ drivers/tty/tty_ldisc.c                            |   16 +-
+ drivers/tty/tty_port.c                             |   22 +
+ drivers/tty/vt/keyboard.c                          |   80 +-
+ drivers/tty/vt/vt.c                                |   48 +-
+ drivers/usb/chipidea/core.c                        |   74 +-
+ drivers/usb/chipidea/otg.c                         |    7 +-
+ drivers/usb/class/cdc-acm.c                        |   53 +-
+ drivers/usb/core/config.c                          |    4 +-
+ drivers/usb/core/endpoint.c                        |    8 -
+ drivers/usb/core/message.c                         |   20 +-
+ drivers/usb/core/of.c                              |    8 +-
+ drivers/usb/core/port.c                            |   21 +-
+ drivers/usb/dwc3/Kconfig                           |   12 +
+ drivers/usb/dwc3/Makefile                          |    1 +
+ drivers/usb/dwc3/core.c                            |   29 +-
+ drivers/usb/dwc3/core.h                            |    9 +-
+ drivers/usb/dwc3/dwc3-generic-plat.c               |   25 +-
+ drivers/usb/dwc3/dwc3-imx.c                        |  448 ++++++
+ drivers/usb/dwc3/dwc3-qcom.c                       |    4 +-
+ drivers/usb/dwc3/gadget.c                          |    2 +-
+ drivers/usb/dwc3/glue.h                            |    3 +
+ drivers/usb/dwc3/ulpi.c                            |   25 +
+ drivers/usb/gadget/function/f_hid.c                |   17 +-
+ drivers/usb/gadget/function/f_midi2.c              |    6 +-
+ drivers/usb/gadget/function/f_ncm.c                |    4 +-
+ drivers/usb/gadget/function/f_phonet.c             |    9 +
+ drivers/usb/gadget/function/u_serial.c             |    2 +-
+ drivers/usb/gadget/udc/bdc/bdc_ep.c                |    4 +
+ drivers/usb/gadget/udc/core.c                      |    5 +-
+ drivers/usb/gadget/udc/pxa27x_udc.c                |   66 +-
+ drivers/usb/gadget/udc/renesas_usb3.c              |    7 +-
+ drivers/usb/gadget/udc/snps_udc_core.c             |    2 +-
+ drivers/usb/host/ehci-orion.c                      |    9 -
+ drivers/usb/host/fhci-hcd.c                        |   15 +-
+ drivers/usb/host/fhci.h                            |    3 +-
+ drivers/usb/host/xhci-debugfs.c                    |   10 +-
+ drivers/usb/host/xhci-hub.c                        |  381 +++--
+ drivers/usb/host/xhci-mem.c                        |  133 +-
+ drivers/usb/host/xhci-mvebu.c                      |    2 +-
+ drivers/usb/host/xhci-ring.c                       |    9 +-
+ drivers/usb/host/xhci-tegra.c                      |   12 +-
+ drivers/usb/host/xhci.c                            |  229 +--
+ drivers/usb/host/xhci.h                            |  124 +-
+ drivers/usb/image/microtek.c                       |   79 +-
+ drivers/usb/misc/apple-mfi-fastcharge.c            |    3 +-
+ drivers/usb/misc/appledisplay.c                    |    8 +-
+ drivers/usb/misc/cypress_cy7c63.c                  |    4 +-
+ drivers/usb/misc/cytherm.c                         |    4 +-
+ drivers/usb/misc/iowarrior.c                       |   42 +-
+ drivers/usb/misc/onboard_usb_dev.c                 |    5 +
+ drivers/usb/misc/onboard_usb_dev.h                 |   38 +-
+ drivers/usb/misc/trancevibrator.c                  |    3 +-
+ drivers/usb/misc/usb-ljca.c                        |   15 +-
+ drivers/usb/misc/usbsevseg.c                       |    3 +-
+ drivers/usb/misc/uss720.c                          |   27 +-
+ drivers/usb/musb/musb_core.c                       |    2 +-
+ drivers/usb/renesas_usbhs/mod_gadget.c             |   16 +-
+ drivers/usb/serial/iuu_phoenix.c                   |    2 +-
+ drivers/usb/serial/option.c                        |    2 +
+ drivers/usb/serial/ti_usb_3410_5052.c              |   16 +-
+ drivers/usb/storage/uas.c                          |    4 +-
+ drivers/usb/storage/unusual_devs.h                 |    7 +-
+ drivers/usb/typec/mux.c                            |   25 +-
+ drivers/usb/typec/mux/ps883x.c                     |    1 +
+ drivers/usb/typec/tcpm/Kconfig                     |    2 +
+ drivers/usb/typec/tcpm/fusb302.c                   |   18 +-
+ drivers/usb/typec/tcpm/tcpci.c                     |   20 +-
+ drivers/usb/typec/tcpm/tcpci_maxim.h               |    1 +
+ drivers/usb/typec/tcpm/tcpci_maxim_core.c          |   54 +-
+ drivers/usb/typec/tcpm/tcpci_rt1711h.c             |   45 +-
+ drivers/usb/typec/tcpm/tcpm.c                      |  889 +++++++++--
+ drivers/usb/typec/tipd/core.c                      |    6 +-
+ drivers/usb/typec/ucsi/cros_ec_ucsi.c              |   26 +-
+ drivers/usb/typec/ucsi/ucsi.c                      |   14 +-
+ drivers/usb/typec/ucsi/ucsi.h                      |    3 +
+ drivers/usb/typec/ucsi/ucsi_glink.c                |    4 +
+ drivers/usb/typec/ucsi/ucsi_huawei_gaokun.c        |    2 +-
+ drivers/usb/usbip/stub_dev.c                       |    5 +-
+ drivers/usb/usbip/usbip_common.c                   |   83 +-
+ drivers/usb/usbip/vhci_sysfs.c                     |    2 +-
+ fs/buffer.c                                        |    4 +-
+ fs/fs-writeback.c                                  |   22 +-
+ fs/sysfs/group.c                                   |    7 +-
+ fs/userfaultfd.c                                   |    2 -
+ include/dt-bindings/usb/pd.h                       |   36 +
+ include/linux/alloc_tag.h                          |    2 +
+ include/linux/damon.h                              |    2 +
+ include/linux/device.h                             |   45 +
+ include/linux/fs.h                                 |    9 +-
+ include/linux/kexec_handover.h                     |   13 +-
+ include/linux/kho/abi/kexec_handover.h             |   20 +-
+ include/linux/kho/abi/kexec_metadata.h             |   46 +
+ include/linux/linear_range.h                       |    3 +
+ include/linux/liveupdate.h                         |   17 +-
+ include/linux/memcontrol.h                         |  191 +--
+ include/linux/mfd/max77759.h                       |  166 +-
+ include/linux/mm.h                                 |    5 +
+ include/linux/mm_inline.h                          |    6 +
+ include/linux/mmzone.h                             |   42 +-
+ include/linux/pgalloc_tag.h                        |    2 +-
+ include/linux/power_supply.h                       |    3 +
+ include/linux/sched.h                              |    2 +-
+ include/linux/serdev.h                             |    9 +-
+ include/linux/shmem_fs.h                           |   14 -
+ include/linux/swap.h                               |   25 +-
+ include/linux/tty_buffer.h                         |    1 +
+ include/linux/tty_driver.h                         |    7 +
+ include/linux/tty_ldisc.h                          |    6 +-
+ include/linux/tty_port.h                           |   13 +
+ include/linux/usb.h                                |    5 +-
+ include/linux/usb/cdc_ncm.h                        |    4 +-
+ include/linux/usb/pd.h                             |  108 +-
+ include/linux/usb/tcpm.h                           |    2 +-
+ include/linux/usb/typec_altmode.h                  |    3 +
+ include/linux/userfaultfd_k.h                      |   73 +-
+ include/trace/events/memcg.h                       |   10 +-
+ include/trace/events/writeback.h                   |    3 +
+ include/uapi/linux/keyboard.h                      |   29 +
+ include/uapi/linux/usb/ch9.h                       |   33 +-
+ kernel/cgroup/cgroup.c                             |    9 +-
+ kernel/liveupdate/kexec_handover.c                 |  158 +-
+ kernel/liveupdate/kexec_handover_debugfs.c         |   55 +-
+ kernel/liveupdate/kexec_handover_internal.h        |   15 +-
+ kernel/liveupdate/luo_core.c                       |   11 +-
+ kernel/liveupdate/luo_file.c                       |  112 +-
+ kernel/liveupdate/luo_flb.c                        |  182 +--
+ kernel/liveupdate/luo_internal.h                   |    7 +-
+ kernel/liveupdate/luo_session.c                    |   46 +-
+ lib/alloc_tag.c                                    |  109 ++
+ lib/linear_ranges.c                                |   36 +
+ lib/test_hmm.c                                     |  130 +-
+ lib/test_kho.c                                     |    5 +-
+ lib/tests/liveupdate.c                             |   18 -
+ mm/Kconfig.debug                                   |   11 +
+ mm/backing-dev.c                                   |    5 +-
+ mm/compaction.c                                    |   43 +-
+ mm/damon/core.c                                    |  101 +-
+ mm/damon/stat.c                                    |    5 +-
+ mm/filemap.c                                       |    3 +-
+ mm/huge_memory.c                                   |   22 +-
+ mm/hugetlb.c                                       |   18 +
+ mm/internal.h                                      |    1 -
+ mm/kmemleak.c                                      |    2 +-
+ mm/memblock.c                                      |    4 +-
+ mm/memcontrol-v1.c                                 |   31 +-
+ mm/memcontrol-v1.h                                 |    7 +
+ mm/memcontrol.c                                    |  632 +++++---
+ mm/memfd_luo.c                                     |   34 +-
+ mm/mempolicy.c                                     |   31 +-
+ mm/memremap.c                                      |    2 +-
+ mm/migrate.c                                       |    2 +
+ mm/migrate_device.c                                |    6 -
+ mm/mlock.c                                         |    2 +-
+ mm/mprotect.c                                      |  218 +--
+ mm/page_alloc.c                                    |   10 +-
+ mm/page_io.c                                       |   10 +-
+ mm/percpu.c                                        |    2 +-
+ mm/shmem.c                                         |  176 +--
+ mm/shrinker.c                                      |    6 +-
+ mm/sparse.c                                        |    1 -
+ mm/swap.c                                          |   59 +-
+ mm/truncate.c                                      |    6 +-
+ mm/userfaultfd.c                                   |  682 +++++----
+ mm/util.c                                          |   10 -
+ mm/vmalloc.c                                       |    1 +
+ mm/vmscan.c                                        |  303 +++-
+ mm/vmstat.c                                        |    2 +-
+ mm/workingset.c                                    |   30 +-
+ mm/zswap.c                                         |  187 ++-
+ tools/testing/selftests/liveupdate/liveupdate.c    |   41 +
+ .../selftests/mm/charge_reserved_hugetlb.sh        |    5 +
+ tools/testing/selftests/mm/guard-regions.c         |    4 +
+ tools/testing/selftests/mm/hmm-tests.c             |   83 +-
+ tools/testing/selftests/mm/hugetlb_dio.c           |   91 +-
+ tools/testing/selftests/mm/merge.c                 |   88 ++
+ tools/testing/selftests/mm/soft-dirty.c            |    4 +-
+ tools/testing/selftests/mm/split_huge_page_test.c  |   19 +-
+ tools/testing/selftests/mm/thp_settings.c          |   35 +-
+ tools/testing/selftests/mm/thp_settings.h          |    1 -
+ tools/testing/selftests/mm/transhuge-stress.c      |    4 +
+ tools/testing/selftests/mm/vm_util.c               |   24 +
+ tools/testing/selftests/mm/vm_util.h               |    2 +
+ tools/usb/usbip/libsrc/usbip_device_driver.c       |    6 +-
+ tools/usb/usbip/libsrc/usbip_host_common.c         |    3 +
+ tools/usb/usbip/libsrc/usbip_host_driver.c         |    7 +-
+ 363 files changed, 9943 insertions(+), 6686 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/usb/atmel,at91rm9200-udc.yaml
+ create mode 100644 Documentation/devicetree/bindings/usb/atmel,at91sam9rl-udc.yaml
+ delete mode 100644 Documentation/devicetree/bindings/usb/atmel-usb.txt
+ create mode 100644 Documentation/devicetree/bindings/usb/corechips,sl6341.yaml
+ delete mode 100644 Documentation/devicetree/bindings/usb/maxim,max3421.txt
+ create mode 100644 Documentation/devicetree/bindings/usb/maxim,max3421.yaml
+ create mode 100644 Documentation/devicetree/bindings/usb/nxp,imx-dwc3.yaml
+ delete mode 100644 Documentation/devicetree/bindings/usb/ohci-st.txt
+ delete mode 100644 Documentation/devicetree/bindings/usb/omap-usb.txt
+ create mode 100644 Documentation/devicetree/bindings/usb/renesas,upd720201-pci.yaml
+ create mode 100644 Documentation/devicetree/bindings/usb/st,st-ohci-300x.yaml
+ create mode 100644 Documentation/devicetree/bindings/usb/starfive,jhb100-dwc3.yaml
+ create mode 100644 Documentation/devicetree/bindings/usb/terminus,fe11.yaml
+ create mode 100644 Documentation/devicetree/bindings/usb/ti,dwc3.yaml
+ create mode 100644 Documentation/devicetree/bindings/usb/ti,omap4-musb.yaml
+ create mode 100644 drivers/power/supply/max77759_charger.c
+ delete mode 100644 drivers/tty/serial/esp32_acm.c
+ delete mode 100644 drivers/tty/serial/esp32_uart.c
+ create mode 100644 drivers/usb/dwc3/dwc3-imx.c
+ create mode 100644 include/linux/kho/abi/kexec_metadata.h
+[✓] Repository updated
+
+=======================================
+[*] Processing 5.10.y
+=======================================
+[*] Last processed version: 5.10.253
+[*] Latest available version: v5.10.253
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.1.y
+=======================================
+[*] Last processed version: 6.1.169
+[*] Latest available version: v6.1.169
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.12.y
+=======================================
+[*] Last processed version: 6.12.82
+[*] Latest available version: v6.12.82
+[✓] Already up-to-date
+
+=======================================
+[*] CVE Scraping
+=======================================
+[*] CVE start date: 2026-04-14
+INFO  Detected 14 CPUs -> using 7 parallel workers
+
+DATE [2026/04/14] Discovering CVE count ...
+     [2026/04/14] No CVEs found.
+
+DATE [2026/04/15] Discovering CVE count ...
+     [2026/04/15] No CVEs found.
+
+DATE [2026/04/16] Discovering CVE count ...
+     [2026/04/16] No CVEs found.
+
+DATE [2026/04/17] Discovering CVE count ...
+     [2026/04/17] No CVEs found.
+
+DATE [2026/04/18] Discovering CVE count ...
+     [2026/04/18] No CVEs found.
+
+DATE [2026/04/19] Discovering CVE count ...
+     [2026/04/19] No CVEs found.
+
+DATE [2026/04/20] Discovering CVE count ...
+     [2026/04/20] Fetching 2 CVEs in parallel ...
+  OK  CVE-2026-31430  (5 branches)  https://lists.openwall.net/linux-cve-announce/2026/04/20/1
+  OK  CVE-2026-31429  (4 branches)  https://lists.openwall.net/linux-cve-announce/2026/04/20/2
+     [2026/04/20] Parsed 2 CVEs
+
+Appended 2 CVEs -> cve_scraper.csv
+Branches: ['6.6.y', '6.12.y', '6.18.y', '6.19.y', '7.0.y']
+
+=======================================
+            FINAL SUMMARY              
+=======================================
+Branch: 5.10.y
+  Last Version   : 5.10.253
+  Latest Version : v5.10.253
+  New Commits    : 0
+
+Branch: 6.1.y
+  Last Version   : 6.1.169
+  Latest Version : v6.1.169
+  New Commits    : 0
+
+Branch: 6.12.y
+  Last Version   : 6.12.82
+  Latest Version : v6.12.82
+  New Commits    : 0
+
+CVE Summary:
+  Start Date : 2026-04-14
+  New CVEs   : 2
+=======================================
+[✓] FULL AUTOMATION COMPLETED
+=======================================
+[✓] Status file updated: update_status.txt
+
+=======================================
+[*] Sending Email Report
+=======================================
+[✓] Email sent with log file: run_2026-04-20_15-44-25.txt
