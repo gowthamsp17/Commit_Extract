@@ -18,7 +18,6 @@ CVE_SCRIPT=./cve_scraper.py
 NO_FILES=NO_files_final.txt
 NO_DIRS=NO_directories_final.txt
 
-SERVER_INFO=/home/gowtham-23345/server_info
 CVE_FILE=cve_scraper.csv
 
 SERIES_LIST=("5.10" "6.1" "6.12")
@@ -100,7 +99,7 @@ for series in "${SERIES_LIST[@]}"; do
 
     echo "[*] New commits added: $new_commits"
 
-    config_file=$(ls "$SERVER_INFO"/config-${series}.* 2>/dev/null | sort -V | tail -1)
+    config_file=$(ls /config-${series}.* 2>/dev/null | sort -V | tail -1)
 
     if [[ -z "$config_file" ]]; then
         echo "[!] Config not found"
