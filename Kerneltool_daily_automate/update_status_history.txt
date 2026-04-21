@@ -128,3 +128,29 @@ CVE Status         : UP-TO-DATE
 CVE Start Date     : 2026-04-21
 New CVEs Added     : 0
 =======================================
+----------------------------------------
+=======================================
+Last Run Time      : 2026-04-20 17:16:03
+Kernel Status      : UP-TO-DATE
+CVE Status         : UP-TO-DATE
+----------------------------------------
+5.10.y   : last=5.10.253   latest=v5.10.253    new_commits=0
+6.1.y    : last=6.1.169    latest=v6.1.169     new_commits=0
+6.12.y   : last=6.12.82    latest=v6.12.82     new_commits=0
+----------------------------------------
+CVE Start Date     : 2026-04-21
+New CVEs Added     : 0
+=======================================
+----------------------------------------
+=======================================
+Last Run Time      : 2026-04-21 10:00:04
+Kernel Status      : UP-TO-DATE
+CVE Status         : UP-TO-DATE
+----------------------------------------
+5.10.y   : last=5.10.253   latest=v5.10.253    new_commits=0
+6.1.y    : last=6.1.169    latest=v6.1.169     new_commits=0
+6.12.y   : last=6.12.82    latest=v6.12.82     new_commits=0
+----------------------------------------
+CVE Start Date     : 2026-04-21
+New CVEs Added     : 0
+=======================================

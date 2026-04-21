@@ -67,6 +67,13 @@ APPLIC_COLOR = {
     "Not applicable": DIM,
 }
 
+VER_APPLIC_COLOR = {
+    "Applicable":     GRN + BOLD,
+    "Not Applicable": RED,
+    "No Fixes":       DIM,
+    "Unknown":        YEL,
+}
+
 EPILOG = textwrap.dedent("""
 EXAMPLES
 
@@ -134,6 +141,17 @@ EXAMPLES
   # Show all update records for today
   kerneltool --updates --date 2026-04-20
 
+  # Fix-date applicability: are fixes backported before 6.1.76 was released?
+  kerneltool --branch 6.1.y --has-fixes --version-applicable 6.1.76
+
+  # Combine with severity filter
+  kerneltool --branch 6.1.y --severity High Critical --version-applicable 6.1.76
+
+  # Only show commits that are Applicable for 6.1.76
+  kerneltool --branch 6.1.y --version-applicable 6.1.76 --filter-ver-applicable Applicable
+
+  # Show Applicable and No Fixes together
+  kerneltool --branch 6.1.y --version-applicable 6.1.76 --filter-ver-applicable Applicable "No Fixes"
 
 FIELD NAMES  (for --fields)
   hash           Commit hash
@@ -153,6 +171,7 @@ FIELD NAMES  (for --fields)
   cc-security    Cc security flag
   fixes          All Fix-N columns: hash, link, author-date, commit-date, description, subsystem, files, config
   cves           Matched CVE numbers
+  ver-applicable Version Applicability (requires --version-applicable)
   all            Every column
 
 VERSION RANGE NOTES
@@ -312,6 +331,24 @@ def build_parser():
         help="Only commits tagged 'Cc: security'.")
     filt.add_argument("--has-fixes", action="store_true",
         help="Only commits that have at least one Fix entry.")
+    filt.add_argument("--version-applicable", metavar="VER",
+        help=(
+            "Compute fix-based applicability against a kernel version. "
+            "For each commit that has fixes, the CommitDate of the last fix entry "
+            "is compared against the CommitDate of the given version (taken from any "
+            "commit whose First Version == VER). If last-fix date < version date → "
+            "'Applicable'; otherwise → 'Not Applicable'. Commits without fixes are "
+            "marked 'No Fixes'. Result shown in a 'Version Applicability' column. "
+            "Example: --version-applicable 6.1.76"
+        ))
+    filt.add_argument("--filter-ver-applicable", nargs="+",
+        choices=["Applicable", "Not Applicable", "No Fixes", "Unknown"],
+        metavar="VALUE",
+        help=(
+            "Filter by Version Applicability value (requires --version-applicable). "
+            "Choices: Applicable, 'Not Applicable', 'No Fixes', Unknown. OR-combined. "
+            "Example: --filter-ver-applicable Applicable 'No Fixes'"
+        ))
     filt.add_argument("--date-from", metavar="YYYY-MM-DD",
         help="CommitDate >= this date.")
     filt.add_argument("--date-to", metavar="YYYY-MM-DD",
@@ -440,6 +477,88 @@ def filter_cve_records(cve_df, cve_ids):
 
 # ── Version-applicability helper ──────────────────────────────────────────
 
+def get_version_commit_date(df, branch, version):
+    """
+    Return the CommitDate of any commit whose First Version == version.
+    Returns a pandas Timestamp or None if not found.
+    """
+    version_col = f"{branch} First Version"
+    commit_col  = f"{branch} CommitDate"
+    if version_col not in df.columns or commit_col not in df.columns:
+        return None
+    rows = df[df[version_col].fillna("").astype(str).str.strip() == version.strip()]
+    if rows.empty:
+        return None
+    raw = rows.iloc[0][commit_col]
+    try:
+        return pd.to_datetime(raw, format=DATE_FMT, errors="coerce")
+    except Exception:
+        return None
+
+
+def compute_version_applicability(df, branch, version, full_df=None):
+    """
+    Add a 'Version Applicability' column to df.
+
+    full_df: the unfiltered dataframe — used to find the version's CommitDate
+             even when that version was excluded by --version-from/--version-to.
+
+    Logic per row:
+      - No fixes present                          → 'no fixes'
+      - Last fix CommitDate < version CommitDate  → 'applicable'
+      - Last fix CommitDate >= version CommitDate → 'not applicable'
+      - Date missing/unparseable                  → 'unknown'
+    """
+    lookup_df = full_df if full_df is not None else df
+    commit_col = f"{branch} CommitDate"
+
+    # Collect Fix-N CommitDate columns in order: Fix-1, Fix-2, …
+    fix_date_cols = []
+    seen_fix_nums = []
+    for c in df.columns:
+        if c.startswith("Fix-") and "CommitDate" in c and branch in c:
+            fn = c.split()[0]          # "Fix-N"
+            if fn not in seen_fix_nums:
+                seen_fix_nums.append(fn)
+                fix_date_cols.append(c)
+    # sort by the numeric suffix: Fix-1 < Fix-2 < …
+    fix_date_cols.sort(key=lambda c: int(c.split("-")[1].split()[0]))
+
+    # Also need corresponding hash cols to detect presence
+    fix_hash_cols = []
+    for fn in [c.split()[0] for c in fix_date_cols]:
+        hc = f"{fn} {branch} Commit Hash"
+        fix_hash_cols.append(hc if hc in df.columns else None)
+
+    ver_date = get_version_commit_date(lookup_df, branch, version)
+    if ver_date is None or pd.isna(ver_date):
+        # Can't determine version date — mark everything unknown
+        df = df.copy()
+        df["Version Applicability"] = "Unknown (version not found)"
+        return df
+
+    def _row_applicability(row):
+        # Find the last fix that actually has a hash (= exists)
+        last_fix_date_col = None
+        for hc, dc in zip(fix_hash_cols, fix_date_cols):
+            if hc and pd.notna(row.get(hc, None)) and str(row.get(hc, "")).strip():
+                last_fix_date_col = dc   # keep updating → ends at last present fix
+
+        if last_fix_date_col is None:
+            return "No Fixes"
+
+        raw_date = row.get(last_fix_date_col, None)
+        fix_date = pd.to_datetime(raw_date, format=DATE_FMT, errors="coerce")
+        if pd.isna(fix_date):
+            return "Unknown"
+
+        return "Applicable" if fix_date < ver_date else "Not Applicable"
+
+    df = df.copy()
+    df["Version Applicability"] = df.apply(_row_applicability, axis=1)
+    return df
+
+
 # ── Core filtering ────────────────────────────────────────────────────────
 
 def parse_date(s):
@@ -544,6 +663,7 @@ FIELD_MAP = {
     "cc-security":   lambda b: ["Cc security"],
     "fixes":         lambda b: [],
     "cves":          lambda b: ["Matched CVEs"],
+    "ver-applicable": lambda b: ["Version Applicability"],
 }
 
 # version and cves are now default
@@ -605,6 +725,10 @@ def colourize_columns(df):
             df[col] = df[col].apply(
                 lambda s: f"{APPLIC_COLOR.get(s, '')}{s}{RST}" if pd.notna(s) and s else s
             )
+    if "Version Applicability" in df.columns:
+        df["Version Applicability"] = df["Version Applicability"].apply(
+            lambda s: f"{VER_APPLIC_COLOR.get(s, '')}{s}{RST}" if pd.notna(s) and s else s
+        )
     return df
 
 
@@ -728,7 +852,7 @@ def main():
         if val and not parse_date(val):
             parser.error(f"{flag}: invalid date '{val}'. Use YYYY-MM-DD.")
 
-    for attr, flag in [("version_from", "--version-from"), ("version_to", "--version-to")]:
+    for attr, flag in [("version_from", "--version-from"), ("version_to", "--version-to"), ("version_applicable", "--version-applicable")]:
         val = getattr(args, attr, None)
         if val:
             parts = str(val).split(".")
@@ -783,6 +907,15 @@ def main():
 
         filtered = apply_filters(df, branch, args, cve_short, cve_hashes)
 
+        # --version-applicable: compute fix-date vs version-date applicability
+        # NOTE: version date must be looked up in the full df (before filters),
+        # because --version-from/--version-to may have excluded that version's rows.
+        if args.version_applicable:
+            filtered = compute_version_applicability(filtered, branch, args.version_applicable, full_df=df)
+            # --filter-ver-applicable: keep only rows matching chosen values
+            if args.filter_ver_applicable and "Version Applicability" in filtered.columns:
+                filtered = filtered[filtered["Version Applicability"].isin(args.filter_ver_applicable)].copy()
+
         # Always attach CVE column when CVE data is loaded (annotate or xref or --cve)
         if cve_df is not None:
             hash_col = f"{branch} Commit Hash"
@@ -821,6 +954,8 @@ def main():
 
         if not args.count:
             base_fields = args.fields or DEFAULT_FIELDS
+            if args.version_applicable and "ver-applicable" not in base_fields and "all" not in base_fields:
+                base_fields = list(base_fields) + ["ver-applicable"]
             display = select_columns(df, branch, base_fields)
             if args.limit > 0:
                 display = display.head(args.limit)
