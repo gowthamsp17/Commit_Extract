@@ -1,0 +1,124 @@
+=======================================
+[*] Updating Linux repository
+=======================================
+From https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux
+   27d128c1cff6..254f49634ee1  master     -> origin/master
+ * [new tag]                   v7.1-rc1   -> v7.1-rc1
+Updating 27d128c1cff6..254f49634ee1
+Fast-forward
+ .../devicetree/bindings/rtc/isil,isl12026.txt      |  28 --
+ .../devicetree/bindings/rtc/isil,isl12026.yaml     |  59 +++
+ .../bindings/rtc/microchip,mpfs-rtc.yaml           |   3 +
+ .../bindings/rtc/microcrystal,rv3028.yaml          |   2 +
+ .../devicetree/bindings/rtc/olpc-xo1-rtc.txt       |   5 -
+ .../devicetree/bindings/rtc/sprd,sc2731-rtc.yaml   |   7 +-
+ .../devicetree/bindings/rtc/trivial-rtc.yaml       |   2 +
+ Makefile                                           |   6 +-
+ arch/arm/Kconfig                                   |   1 +
+ arch/arm/kernel/module-plts.c                      |  12 +
+ arch/arm/mm/fault.c                                | 158 ++++----
+ arch/arm/mm/fault.h                                |  42 ++-
+ arch/arm/mm/flush.c                                |   4 +-
+ drivers/char/tpm/tpm-chip.c                        |   2 +-
+ drivers/char/tpm/tpm2-cmd.c                        |   8 +-
+ drivers/char/tpm/tpm2-sessions.c                   |   5 +-
+ drivers/char/tpm/tpm_crb.c                         |  35 +-
+ drivers/char/tpm/tpm_i2c_atmel.c                   |  34 +-
+ drivers/char/tpm/tpm_tis_core.c                    |  11 +-
+ drivers/clk/bcm/clk-raspberrypi.c                  |   7 +
+ drivers/rtc/Kconfig                                |   2 +-
+ drivers/rtc/dev.c                                  |  11 +-
+ drivers/rtc/rtc-abx80x.c                           |   5 +-
+ drivers/rtc/rtc-armada38x.c                        |   9 +-
+ drivers/rtc/rtc-cmos.c                             |  13 +-
+ drivers/rtc/rtc-m41t80.c                           |   8 +-
+ drivers/rtc/rtc-max77686.c                         |  14 +-
+ drivers/rtc/rtc-ntxec.c                            |   2 +-
+ drivers/rtc/rtc-pcf2127.c                          |  23 +-
+ drivers/rtc/rtc-rs5c372.c                          |   7 +-
+ drivers/rtc/rtc-rv8803.c                           |   8 +-
+ drivers/rtc/rtc-rx8025.c                           |   4 +-
+ drivers/rtc/rtc-ti-k3.c                            |  10 +-
+ drivers/video/fbdev/aty/radeon_monitor.c           |   2 +-
+ drivers/video/fbdev/clps711x-fb.c                  |   9 +-
+ drivers/video/fbdev/cobalt_lcdfb.c                 |  12 +-
+ drivers/video/fbdev/hgafb.c                        |   9 +-
+ drivers/video/fbdev/offb.c                         |   7 +-
+ drivers/video/fbdev/savage/savagefb_driver.c       |   2 +
+ drivers/virt/coco/tsm-core.c                       |  19 +-
+ fs/adfs/super.c                                    |   3 +
+ include/linux/tpm_eventlog.h                       |   9 +-
+ scripts/package/builddeb                           |   8 +-
+ tools/power/x86/turbostat/turbostat.c              | 231 ++++++++----
+ .../x86_energy_perf_policy.8                       |  26 ++
+ .../x86_energy_perf_policy.c                       | 399 +++++++++++++++------
+ 46 files changed, 834 insertions(+), 449 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rtc/isil,isl12026.txt
+ create mode 100644 Documentation/devicetree/bindings/rtc/isil,isl12026.yaml
+ delete mode 100644 Documentation/devicetree/bindings/rtc/olpc-xo1-rtc.txt
+[✓] Repository updated
+
+=======================================
+[*] Processing 5.10.y
+=======================================
+[*] Last processed version: 5.10.253
+[*] Latest available version: v5.10.253
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.1.y
+=======================================
+[*] Last processed version: 6.1.169
+[*] Latest available version: v6.1.169
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.12.y
+=======================================
+[*] Last processed version: 6.12.83
+[*] Latest available version: v6.12.83
+[✓] Already up-to-date
+
+=======================================
+[*] CVE Scraping
+=======================================
+[*] CVE start date: 2026-04-26
+INFO  Detected 14 CPUs -> using 7 parallel workers
+
+DATE [2026/04/26] Discovering CVE count ...
+     [2026/04/26] No CVEs found.
+
+DATE [2026/04/27] Discovering CVE count ...
+     [2026/04/27] No CVEs found.
+No CVEs found for the given date range.
+
+=======================================
+            FINAL SUMMARY              
+=======================================
+Branch: 5.10.y
+  Last Version   : 5.10.253
+  Latest Version : v5.10.253
+  New Commits    : 0
+
+Branch: 6.1.y
+  Last Version   : 6.1.169
+  Latest Version : v6.1.169
+  New Commits    : 0
+
+Branch: 6.12.y
+  Last Version   : 6.12.83
+  Latest Version : v6.12.83
+  New Commits    : 0
+
+CVE Summary:
+  Start Date : 2026-04-26
+  New CVEs   : 0
+=======================================
+[✓] FULL AUTOMATION COMPLETED
+=======================================
+[✓] Status file updated: update_status.txt
+
+=======================================
+[*] Sending Email Report
+=======================================
+[✓] Email sent with log file: run_2026-04-27_10-00-01.txt

@@ -1,0 +1,76 @@
+=======================================
+[*] Updating Linux repository
+=======================================
+Already up to date.
+[✓] Repository updated
+
+=======================================
+[*] Processing 5.10.y
+=======================================
+[*] Last processed version: 5.10.253
+[*] Latest available version: v5.10.253
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.1.y
+=======================================
+[*] Last processed version: 6.1.169
+[*] Latest available version: v6.1.169
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.12.y
+=======================================
+[*] Last processed version: 6.12.83
+[*] Latest available version: v6.12.83
+[✓] Already up-to-date
+
+=======================================
+[*] CVE Scraping
+=======================================
+[*] CVE start date: 2026-04-23
+INFO  Detected 14 CPUs -> using 7 parallel workers
+
+DATE [2026/04/23] Discovering CVE count ...
+     [2026/04/23] Fetching 3 CVEs in parallel ...
+  OK  CVE-2026-31531  (4 branches)  https://lists.openwall.net/linux-cve-announce/2026/04/23/1
+  OK  CVE-2026-31533  (7 branches)  https://lists.openwall.net/linux-cve-announce/2026/04/23/3
+  OK  CVE-2026-31532  (4 branches)  https://lists.openwall.net/linux-cve-announce/2026/04/23/2
+     [2026/04/23] Parsed 3 CVEs
+
+DATE [2026/04/24] Discovering CVE count ...
+     [2026/04/24] No CVEs found.
+
+Appended 3 CVEs -> cve_scraper.csv
+Branches: ['5.15.y', '6.1.y', '6.6.y', '6.12.y', '6.18.y', '6.19.y', '7.0.y']
+
+=======================================
+            FINAL SUMMARY              
+=======================================
+Branch: 5.10.y
+  Last Version   : 5.10.253
+  Latest Version : v5.10.253
+  New Commits    : 0
+
+Branch: 6.1.y
+  Last Version   : 6.1.169
+  Latest Version : v6.1.169
+  New Commits    : 0
+
+Branch: 6.12.y
+  Last Version   : 6.12.83
+  Latest Version : v6.12.83
+  New Commits    : 0
+
+CVE Summary:
+  Start Date : 2026-04-23
+  New CVEs   : 3
+=======================================
+[✓] FULL AUTOMATION COMPLETED
+=======================================
+[✓] Status file updated: update_status.txt
+
+=======================================
+[*] Sending Email Report
+=======================================
+[✓] Email sent with log file: run_2026-04-24_10-00-01.txt
