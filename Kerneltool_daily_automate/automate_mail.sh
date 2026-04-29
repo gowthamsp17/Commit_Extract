@@ -99,7 +99,7 @@ for series in "${SERIES_LIST[@]}"; do
 
     echo "[*] New commits added: $new_commits"
 
-    config_file=$(ls /config-${series}.* 2>/dev/null | sort -V | tail -1)
+    config_file=$(ls config-${series}.* 2>/dev/null | sort -V | tail -1)
 
     if [[ -z "$config_file" ]]; then
         echo "[!] Config not found"
@@ -108,8 +108,6 @@ for series in "${SERIES_LIST[@]}"; do
 
     python3 "$PYTHON_SCRIPT" \
         --repo "$REPO" \
-    #    --no-files "$NO_FILES" \
-    #    --no-dirs "$NO_DIRS" \
         --output "$output_csv" \
         --branch "${series}.y:origin/linux-${series}.y:${config_file}" \
         --file "$log_file" \
