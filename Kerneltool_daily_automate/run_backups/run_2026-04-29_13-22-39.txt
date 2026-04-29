@@ -1,0 +1,70 @@
+=======================================
+[*] Updating Linux repository
+=======================================
+Already up to date.
+[✓] Repository updated
+
+=======================================
+[*] Processing 5.10.y
+=======================================
+[*] Last processed version: 5.10.253
+[*] Latest available version: v5.10.253
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.1.y
+=======================================
+[*] Last processed version: 6.1.169
+[*] Latest available version: v6.1.169
+[✓] Already up-to-date
+
+=======================================
+[*] Processing 6.12.y
+=======================================
+[*] Last processed version: 6.12.84
+[*] Latest available version: v6.12.84
+[✓] Already up-to-date
+
+=======================================
+[*] CVE Scraping
+=======================================
+[*] CVE start date: 2026-04-28
+INFO  Detected 14 CPUs -> using 7 parallel workers
+
+DATE [2026/04/28] Discovering CVE count ...
+     [2026/04/28] No CVEs found.
+
+DATE [2026/04/29] Discovering CVE count ...
+     [2026/04/29] No CVEs found.
+No CVEs found for the given date range.
+
+=======================================
+            FINAL SUMMARY              
+=======================================
+Branch: 5.10.y
+  Last Version   : 5.10.253
+  Latest Version : v5.10.253
+  New Commits    : 0
+
+Branch: 6.1.y
+  Last Version   : 6.1.169
+  Latest Version : v6.1.169
+  New Commits    : 0
+
+Branch: 6.12.y
+  Last Version   : 6.12.84
+  Latest Version : v6.12.84
+  New Commits    : 0
+
+CVE Summary:
+  Start Date : 2026-04-28
+  New CVEs   : 0
+=======================================
+[✓] FULL AUTOMATION COMPLETED
+=======================================
+[✓] Status file updated: update_status.txt
+
+=======================================
+[*] Sending Email Report
+=======================================
+[✓] Email sent with log file: run_2026-04-29_13-22-39.txt
