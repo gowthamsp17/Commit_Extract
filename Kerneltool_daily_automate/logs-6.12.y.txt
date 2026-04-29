@@ -19107,3 +19107,39 @@
 6.12.83 bc9843c39f9932a8b36efd1d362ea00bb88e4e78 ipv6: add NULL checks for idev in SRv6 paths
 6.12.83 817daf163312a3c8eb9d59bcf6806f99f4b367a5 PCI: Revert "Enable ACS after configuring IOMMU for OF platforms"
 6.12.83 eefc95626b5cb02ea6268d1ae58237768004a60d Linux 6.12.83
+6.12.84 5a525c43baaba0bf3063f86996ca3623b71e4172 mm/userfaultfd: fix hugetlb fault mutex hash calculation
+6.12.84 73bf218de28d039126dc64281d2b47dd3c46a0a3 PCI: endpoint: pci-epf-vntb: Remove duplicate resource teardown
+6.12.84 92a9607a3d6eab030d966fb5e6bf1c4c76b6a3c4 ima: verify if the segment size has changed
+6.12.84 9a3ae29cced6042dbbcbd46189889d28ea5572fc ima: do not copy measurement list to kdump kernel
+6.12.84 3b4d27acafaeab478fd24f79ad6e593a892828b9 wifi: mac80211: always free skb on ieee80211_tx_prepare_skb() failure
+6.12.84 fd9f8aa255cc82d1c22a755930dda9e2a2541baa rust: warn on bindgen < 0.69.5 and libclang >= 19.1
+6.12.84 d3a9ffcd51a1dc78a0e3925db4ff889a7ec0e347 net: ethernet: mtk_eth_soc: initialize PPE per-tag-layer MTU registers
+6.12.84 31605d686c427d60c552d4a1ca9ff84237dbc234 drm/amdgpu: replace PASID IDR with XArray
+6.12.84 894d1f25f82e627e0027ca30d2343a8bdcfe40c9 scripts: generate_rust_analyzer.py: define scripts
+6.12.84 138ada1337b47cc5efb08e517674d46f86268274 mm/pagewalk: fix race between concurrent split and refault
+6.12.84 e33c65f011980b4ad4abfd93585ec2079856368f ksmbd: fix use-after-free in __ksmbd_close_fd() via durable scavenger
+6.12.84 aebeb94720cd7e2aa8de05f1b90742c553b02c7a scripts/dtc: Remove unused dts_version in dtc-lexer.l
+6.12.84 29b44d904dceb832be880def08b8cb17a0aba91c rxrpc: only handle RESPONSE during service challenge
+6.12.84 4b1613d7e2deda831a97e427d1ea586e50fe1be5 fs/ntfs3: validate rec->used in journal-replay file record check
+6.12.84 c78206dcb912ab60b8ee3cbe8c48d749a9a12e1e f2fs: fix to avoid memory leak in f2fs_rename()
+6.12.84 45c05af36311624c1148123caeb011312495d86b fuse: reject oversized dirents in page cache
+6.12.84 ec218dd7b7ed5773a93794fa3679c26952df5a13 fuse: Check for large folio with SPLICE_F_MOVE
+6.12.84 c56fbf5c83425d33a12aebbc6384c16c2c724e8f fuse: quiet down complaints in fuse_conn_limit_write
+6.12.84 95e5aa3c3261da8c95b27d7aecf8ee39b9f86a4c ksmbd: require minimum ACE size in smb_check_perm_dacl()
+6.12.84 295a9fc6789d1011c36ded9f0f2907bb34fa0de4 smb: server: fix active_num_conn leak on transport allocation failure
+6.12.84 7dccf3b73bb12572840954ad24d4284adda2b068 smb: server: fix max_connections off-by-one in tcp accept path
+6.12.84 c8eef12af1cc73031639ea7cf16e0b10e2536b0b smb: client: require a full NFS mode SID before reading mode bits
+6.12.84 ac2f14e4705d020f04e806efa0d49ab8dc2b145f smb: client: fix OOB read in smb2_ioctl_query_info QUERY_INFO path
+6.12.84 7dd0c858e1909769a4c91842724315ee74f1a5f1 ksmbd: validate response sizes in ipc_validate_msg()
+6.12.84 063a7409b0de46d7c770b65bb0338e6fdb3b1f0a ksmbd: validate num_aces and harden ACE walk in smb_inherit_dacl()
+6.12.84 98f3de6ef4efbd899348d333f0902dc4ff14380c ksmbd: fix out-of-bounds write in smb2_get_ea() EA alignment
+6.12.84 e1955a94b6f17f4b058afa955a6f187eb3ed7615 ksmbd: use check_add_overflow() to prevent u16 DACL size overflow
+6.12.84 f5154cf3ce1c8193f0c1891d3769f62740cfe6fe f2fs: fix use-after-free of sbi in f2fs_compress_write_end_io()
+6.12.84 9c8cfbd38d8aa8588953c9984b8afb5e896773e5 ALSA: usb-audio: apply quirk for MOONDROP JU Jiu
+6.12.84 1d9be95aee6c6246a21752e60c9519902649f482 ALSA: caiaq: take a reference on the USB device in create_card()
+6.12.84 3a1bf9116ea31470b89692585c3910dfe830dcdd net/packet: fix TOCTOU race on mmap'd vnet_hdr in tpacket_snd()
+6.12.84 59e9ae81f8670ccc780bc75f45a355736f640ec9 crypto: ccp: Don't attempt to copy CSR to userspace if PSP command failed
+6.12.84 78b97e43d0b3e674d9d49ae56937b11e2ba3fcaf crypto: ccp: Don't attempt to copy PDH cert to userspace if PSP command failed
+6.12.84 1fbac0429a42adec830491757a2b53956dd797ea crypto: ccp: Don't attempt to copy ID to userspace if PSP command failed
+6.12.84 4458757c020592a3094366e0fb20457383b42f92 rxrpc: Fix missing validation of ticket length in non-XDR key preparsing
+6.12.84 c286ea5e62389897291fa742d2bb909ecc9ef2d0 Linux 6.12.84

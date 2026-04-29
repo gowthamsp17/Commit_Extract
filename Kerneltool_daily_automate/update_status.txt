@@ -1,12 +1,12 @@
 =======================================
-Last Run Time      : 2026-04-27 11:42:25
+Last Run Time      : 2026-04-29 10:00:06
 Kernel Status      : UP-TO-DATE
 CVE Status         : UP-TO-DATE
 ----------------------------------------
 5.10.y   : last=5.10.253   latest=v5.10.253    new_commits=0
 6.1.y    : last=6.1.169    latest=v6.1.169     new_commits=0
-6.12.y   : last=6.12.83    latest=v6.12.83     new_commits=0
+6.12.y   : last=6.12.84    latest=v6.12.84     new_commits=0
 ----------------------------------------
-CVE Start Date     : 2026-04-26
+CVE Start Date     : 2026-04-28
 New CVEs Added     : 0
 =======================================
